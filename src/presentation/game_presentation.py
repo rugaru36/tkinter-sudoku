@@ -9,7 +9,8 @@ from presentation.screens.value_input import Value_Input
 class Game_Presentation:
     def __init__(self) -> None:
         self._difficulty_selector: Final = Difficulty_Selector()
-        self._main_screen: Final = Main_Screen(self._on_element_select, self.run)
+        self._main_screen: Final = Main_Screen(
+            self._on_element_select, self.run)
         self._input_screen: Final = Value_Input()
 
         self._selected_difficulty_level: str | None = None

@@ -22,13 +22,19 @@ class Difficulty_Selector:
 
         window.title("Select difficulty")
 
-        easy_btn = Button(text=Difficulty.easy, command=lambda: self._on_select(Difficulty.easy))
-        mid_btn = Button(text=Difficulty.mid, command=lambda: self._on_select(Difficulty.mid))
-        hard_btn = Button(text=Difficulty.hard, command=lambda: self._on_select(Difficulty.hard))
+        easy_btn = Button(text=Difficulty.easy,
+                          command=lambda: self._on_select(Difficulty.easy))
+        mid_btn = Button(text=Difficulty.mid,
+                         command=lambda: self._on_select(Difficulty.mid))
+        hard_btn = Button(text=Difficulty.hard,
+                          command=lambda: self._on_select(Difficulty.hard))
 
-        easy_btn.grid(row=0, column=0, columnspan=10, ipadx=100, ipady=6, padx=4, pady=4, sticky=NSEW)
-        mid_btn.grid(row=1, column=0, columnspan=10, ipadx=100, ipady=6, padx=4, pady=4, sticky=NSEW)
-        hard_btn.grid(row=2, column=0, columnspan=10, ipadx=100, ipady=6, padx=4, pady=4, sticky=NSEW)
+        easy_btn.grid(row=0, column=0, columnspan=10, ipadx=100,
+                      ipady=6, padx=4, pady=4, sticky=NSEW)
+        mid_btn.grid(row=1, column=0, columnspan=10, ipadx=100,
+                     ipady=6, padx=4, pady=4, sticky=NSEW)
+        hard_btn.grid(row=2, column=0, columnspan=10, ipadx=100,
+                      ipady=6, padx=4, pady=4, sticky=NSEW)
 
         self._root_widget = window
         window.mainloop()
@@ -40,8 +46,3 @@ class Difficulty_Selector:
     def _destroy_root_widget(self):
         if self._root_widget is not None:
             self._root_widget.destroy()
-
-
-
-
-

@@ -2,6 +2,8 @@ import random
 from typing import Final
 
 # state of fullfilling process
+
+
 class Filling_State:
     def __init__(self, size_of_field: int, num_of_unknown: int) -> None:
         self._unknown_elements_coordinates: list[list[int]] = []
@@ -12,7 +14,7 @@ class Filling_State:
     def reload(self):
         self._generate_unknown_element_coordinates()
 
-    def get_unknown_elements_count(self): 
+    def get_unknown_elements_count(self):
         return len(self._unknown_elements_coordinates)
 
     def get_unknown_elements_coordinates(self):
@@ -22,7 +24,7 @@ class Filling_State:
         index = self._get_unknown_element_index(row, col)
         if index is not None:
             del self._unknown_elements_coordinates[index]
-    
+
     def check_is_actually_unknown(self, row: int, col: int):
         index = self._get_unknown_element_index(row, col)
         return index is not None
@@ -45,6 +47,6 @@ class Filling_State:
             element = self._unknown_elements_coordinates[index]
             element_row = element[0]
             element_col = element[1]
-            if element_row == row and element_col == col: 
+            if element_row == row and element_col == col:
                 return index
         return None

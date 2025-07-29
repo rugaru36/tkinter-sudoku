@@ -5,6 +5,9 @@ class Game_Status:
 
     @staticmethod
     def get_status(elements_left: int, mistakes_left: int) -> str:
-        if mistakes_left <= 0: return Game_Status.game_is_lost
-        elif elements_left == 0: return Game_Status.game_is_won
-        else: return Game_Status.in_process
+        if mistakes_left <= 0:
+            return Game_Status.game_is_lost
+        elif elements_left == 0:
+            return Game_Status.game_is_won
+        else:
+            return Game_Status.in_process

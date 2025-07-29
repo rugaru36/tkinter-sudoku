@@ -21,34 +21,38 @@ class Main_Screen:
         self._status_label: Label | None = None
 
     def on_new_value(self, value: int):
-        if self._game_process is None: return
+        if self._game_process is None:
+            return
         row = self._selected_row
         col = self._selected_col
-        if row is None or col is None: raise ValueError("element was not selected earlier!")
+        if row is None or col is None:
+            raise ValueError("element was not selected earlier!")
         is_correct = self._game_process.on_new_value(value, row, col)
-        if is_correct: 
+        if is_correct:
             correct_value = self._game_process.get_num_field_value(row, col)
             self._num_buttons[row][col]["text"] = str(correct_value)
         self._update_status_label()
-    
+
     def run(self, difficulty: str):
         if self._game_process:
             self._game_process.reload(difficulty)
             self._reload_values_to_default()
-        else: 
+        else:
             self._game_process = Game_Process(difficulty)
         self._show()
-    
+
     def _on_element_select(self, row: int, col: int):
-        if self._game_process is None: return
+        if self._game_process is None:
+            return
         is_unknown = self._game_process.check_is_unknown(row, col)
-        if not is_unknown or not self._is_in_progress: return
+        if not is_unknown or not self._is_in_progress:
+            return
         self._selected_row = row
         self._selected_col = col
         self._cb_on_element_selected()
 
     def _on_reload(self):
-        if self._root_widget is not None: 
+        if self._root_widget is not None:
             self._root_widget.destroy()
             self._root_widget = None
         self._cb_on_reload()
@@ -56,14 +60,14 @@ class Main_Screen:
     def _show(self):
         window = Tk()
         window.resizable(False, False)
-        try: 
+        try:
             window.iconphoto(False, PhotoImage(file='icon.png'))
         except:
             print("problem while loading icon")
-        
+
         self._draw_top_menu()
         self._draw_num_field()
-        
+
         window.title("Game")
 
         self._root_widget = window
@@ -83,7 +87,8 @@ class Main_Screen:
         self._update_status_label()
 
     def _draw_num_field(self):
-        if self._game_process is None: return
+        if self._game_process is None:
+            return
         field_size = self._game_process.get_num_field_size()
 
         # generate empty frames (groups)
@@ -103,16 +108,20 @@ class Main_Screen:
         for row in range(field_size):
             row_buttons: list[Button] = []
             for col in range(field_size):
-                curr_frame = field_frames[row // block_elements][col // block_elements]
+                curr_frame = field_frames[row //
+                                          block_elements][col // block_elements]
                 is_unknown = self._game_process.check_is_unknown(row, col)
-                btn_text = "" if is_unknown else str(self._game_process.get_num_field_value(row, col))
-                btn = Button(curr_frame, text=btn_text, width=1, command=lambda row=row, col=col: self._on_element_select(row, col))
+                btn_text = "" if is_unknown else str(
+                    self._game_process.get_num_field_value(row, col))
+                btn = Button(curr_frame, text=btn_text, width=1,
+                             command=lambda row=row, col=col: self._on_element_select(row, col))
                 btn.grid(column=col, row=row)
                 row_buttons.append(btn)
             self._num_buttons.append(row_buttons)
 
     def _update_status_label(self):
-        if self._game_process is None: return
+        if self._game_process is None:
+            return
         left_elements = self._game_process.get_unknown_elements_count()
         # left
         left_mistakes = self._game_process.get_left_mistakes()
@@ -122,7 +131,7 @@ class Main_Screen:
         self._is_in_progress = status == Game_Status.in_process
 
     def _reload_values_to_default(self):
-        if self._root_widget: 
+        if self._root_widget:
             self._root_widget.destroy()
             self._root_widget = None
         self._num_buttons = []
