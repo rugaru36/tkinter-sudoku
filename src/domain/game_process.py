@@ -13,10 +13,6 @@ class Game_Process:
         self._init_unknown_elements_count: int = 0
         self._unknown_elements_left: int = 0
         self._mistakes_left: int = 0
-
-        # self._selected_row: int | None = None
-        # self._selected_col: int | None = None
-
         self._parse_difficulty()
         self._num_field: Final = Num_Field()
         self._filling_state: Final = Filling_State(
