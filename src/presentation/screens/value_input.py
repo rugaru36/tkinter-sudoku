@@ -39,6 +39,7 @@ class Value_Input:
                       validatecommand=(window.register(
                           self._validate_value), "%P")
                       )
+        entry.focus()
         entry.grid(row=1, column=0, columnspan=5, ipadx=50,
                    ipady=6, padx=4, pady=4, sticky=EW)
 
