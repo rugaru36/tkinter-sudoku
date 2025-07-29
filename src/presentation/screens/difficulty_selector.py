@@ -1,4 +1,4 @@
-from tkinter import NSEW, Button, PhotoImage, Tk
+from tkinter import NSEW, Button, Tk
 
 from domain.difficulty import Difficulty
 

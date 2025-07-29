@@ -1,5 +1,5 @@
 from math import sqrt
-from tkinter import NS, W, Button, Frame, Label, PhotoImage, Tk
+from tkinter import NS, W, Button, Frame, Label, Tk
 from typing import Callable, Final
 from domain.game_process import Game_Process
 from domain.game_status import Game_Status
