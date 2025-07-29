@@ -1,4 +1,4 @@
-from tkinter import EW, Button, Entry, Label, PhotoImage, Toplevel
+from tkinter import EW, Button, Entry, Label, Toplevel
 from typing import Callable
 
 
@@ -15,13 +15,19 @@ class Value_Input:
         self._cb_on_input = cb_on_input
         self._show()
 
+    # True lets change input field value
     def _validate_value(self, value: str) -> bool:
-        is_valid = value.isdecimal() and len(value) <= 1
-        self._is_valid_value = is_valid or (
-            self._is_valid_value and len(value) > 0)
-        if is_valid:
+        is_empty = len(value) == 0
+        is_curr_valid = value.isdecimal() and not is_empty and len(value) == 1
+        self._is_valid_value = is_curr_valid
+        if is_curr_valid:
             self._value = int(value)
-        return is_valid
+            return True
+        elif is_empty:
+            self._value = None
+            return True
+        else:
+            return False
 
     def _show(self):
         window = Toplevel()
