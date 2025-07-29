@@ -60,10 +60,6 @@ class Main_Screen:
     def _show(self):
         window = Tk()
         window.resizable(False, False)
-        try:
-            window.iconphoto(False, PhotoImage(file='icon.png'))
-        except:
-            print("problem while loading icon")
 
         self._draw_top_menu()
         self._draw_num_field()

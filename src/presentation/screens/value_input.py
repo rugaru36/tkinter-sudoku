@@ -26,10 +26,6 @@ class Value_Input:
     def _show(self):
         window = Toplevel()
         window.resizable(False, False)
-        try:
-            window.iconphoto(False, PhotoImage(file='icon.png'))
-        except:
-            print("problem while loading icon")
         window.protocol("WM_DELETE_WINDOW", self._destroy_root_widget)
         window.title("Input value")
 

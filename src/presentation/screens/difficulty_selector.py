@@ -15,10 +15,6 @@ class Difficulty_Selector:
     def _show(self):
         window = Tk()
         window.resizable(False, False)
-        try:
-            window.iconphoto(False, PhotoImage(file='./icon.png'))
-        except:
-            print("problem while loading icon")
 
         window.title("Select difficulty")
 
