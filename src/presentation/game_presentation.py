@@ -16,9 +16,6 @@ class Game_Presentation:
         self._selected_difficulty_level: str | None = None
         pass
 
-    def reload(self):
-        self._select_difficulty()
-
     def run(self):
         self._select_difficulty()
         self._run_main_screen()
