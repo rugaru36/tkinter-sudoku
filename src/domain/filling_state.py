@@ -30,6 +30,7 @@ class Filling_State:
         return index is not None
 
     def _generate_unknown_element_coordinates(self):
+        self._unknown_elements_coordinates = []
         min = 0
         max = self._size_of_field - 1
         for _ in range(self._num_of_unknown_elements):
