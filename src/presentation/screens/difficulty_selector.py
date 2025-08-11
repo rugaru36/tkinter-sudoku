@@ -8,7 +8,7 @@ class Difficulty_Selector:
         self._root_widget: Tk | None = None
         self._selected_difficulty: str | None = None
 
-    def select(self):
+    def run(self):
         self._show()
         return self._selected_difficulty
 

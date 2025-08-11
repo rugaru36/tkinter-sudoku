@@ -21,7 +21,7 @@ class Game_Presentation:
         self._run_main_screen()
 
     def _select_difficulty(self):
-        self._selected_difficulty_level = self._difficulty_selector.select()
+        self._selected_difficulty_level = self._difficulty_selector.run()
         if self._selected_difficulty_level is None:
             sys.exit()
 
