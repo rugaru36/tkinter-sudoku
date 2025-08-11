@@ -1,14 +1,14 @@
 import sys
 from typing import Final
 
-from presentation.screens.difficulty_selector import Difficulty_Selector
+from presentation.screens.difficulty_select_screen import Difficulty_Select_Screen
 from presentation.screens.main_screen import Main_Screen
 from presentation.screens.value_input import Value_Input
 
 
 class Game_Presentation:
     def __init__(self) -> None:
-        self._difficulty_selector: Final = Difficulty_Selector()
+        self._difficulty_select_screen: Final = Difficulty_Select_Screen()
         self._main_screen: Final = Main_Screen(
             self._on_element_select, self.run)
         self._input_screen: Final = Value_Input()
@@ -21,7 +21,7 @@ class Game_Presentation:
         self._run_main_screen()
 
     def _select_difficulty(self):
-        self._selected_difficulty_level = self._difficulty_selector.run()
+        self._selected_difficulty_level = self._difficulty_select_screen.run()
         if self._selected_difficulty_level is None:
             sys.exit()
 

@@ -3,7 +3,7 @@ from tkinter import NSEW, Button, Tk
 from domain.difficulty import Difficulty
 
 
-class Difficulty_Selector:
+class Difficulty_Select_Screen:
     def __init__(self) -> None:
         self._root_widget: Tk | None = None
         self._selected_difficulty: str | None = None
