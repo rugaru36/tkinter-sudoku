@@ -1,41 +1,77 @@
-from tkinter import EW, Button, Entry, Label, Toplevel
-from typing import Callable
+from tkinter import EW, Button, Entry, Label, Tk
+from typing import Callable, Final
+from tkinter.messagebox import showwarning
+
+
+class Validation_Types:
+    only_digits: Final = "Only Digits"
+    random_characters: Final = 'Random Characters'
 
 
 class Value_Input_Screen:
-    def __init__(self) -> None:
-        self._root_widget: Toplevel | None = None
+
+    def __init__(self, cb_on_input: Callable[[str | None], None],) -> None:
+        self._message_label_text: str = ''
+        self._window_title_text: str = ''
+        self._root_widget: Tk | None = None
         self._is_valid_value: bool = False
-        self._value: int | None = None
+        self._value: str = ''
         self._message_label: Label | None = None
-        self._cb_on_input: Callable[[int | None], None] | None = None
+        self._cb_on_input: Callable[[str | None], None] = cb_on_input
+        self._validation_type: str = Validation_Types.random_characters
+        self._min_value_lenght: int = -1
+        self._max_value_lenght: int = 99999999999
         pass
 
-    def run(self, cb_on_input: Callable[[int | None], None]):
-        self._cb_on_input = cb_on_input
+    def run(self,
+            message_label_text: str,
+            window_title_text: str,
+            ):
+        self._message_label_text = message_label_text
+        self._window_title_text = window_title_text
         self._show()
+
+    def set_validation_options(self, validation_type: str, min_length: int = -1, max_length: int = 99999999999):
+        if min_length > max_length:
+            raise ValueError("min_length > than max_length")
+        self._validation_type = validation_type
+        self._min_value_lenght = min_length
+        self._max_value_lenght = max_length
+        return self
 
     # True lets change input field value
     def _validate_value(self, value: str) -> bool:
-        is_empty = len(value) == 0
-        is_curr_valid = value.isdecimal() and not is_empty and len(value) == 1
-        self._is_valid_value = is_curr_valid
-        if is_curr_valid:
-            self._value = int(value)
+        value_length = len(value)
+        is_shorter_than_min = value_length < self._min_value_lenght
+        is_longer_than_max = value_length > self._max_value_lenght
+        is_empty = value_length == 0
+
+        self._is_valid_value = not (is_shorter_than_min or is_longer_than_max)
+
+        if is_empty and is_shorter_than_min:
             return True
-        elif is_empty:
-            self._value = None
-            return True
-        else:
+        elif not self._is_valid_value:
             return False
+        match self._validation_type:
+            case Validation_Types.only_digits:
+                is_valid_as_int = value.isnumeric()
+                self._is_valid_value = is_valid_as_int
+                if is_valid_as_int:
+                    self._value = value
+            case Validation_Types.random_characters:
+                self._value = value
+            case _:
+                raise ValueError('unknown validation type: ' +
+                                 self._validation_type)
+        return self._is_valid_value
 
     def _show(self):
-        window = Toplevel()
+        window = Tk()
         window.resizable(False, False)
         window.protocol("WM_DELETE_WINDOW", self._destroy_root_widget)
-        window.title("Input value")
+        window.title(self._window_title_text)
 
-        message_label = Label(window, text="Input value:")
+        message_label = Label(window, text=self._message_label_text)
         message_label.grid(row=0, column=0, columnspan=5,
                            ipadx=50, ipady=6, padx=4, pady=4, sticky=EW)
 
@@ -63,8 +99,8 @@ class Value_Input_Screen:
             self._destroy_root_widget()
             if self._cb_on_input is not None:
                 self._cb_on_input(self._value)
-        elif not self._is_valid_value and self._message_label:
-            self._message_label["text"] = "Wrong value!"
+        elif not self._is_valid_value:
+            _ = showwarning("Error", "Value is invalid!")
 
     def _destroy_root_widget(self):
         if self._root_widget is None:

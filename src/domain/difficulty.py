@@ -11,7 +11,7 @@ class Difficulty:
         match name:
             case Difficulty.easy:
                 return {
-                    "count_of_unknown_elements": 15,
+                    "count_of_unknown_elements": 1,
                     "count_of_mistakes": 10}
             case Difficulty.mid:
                 return {

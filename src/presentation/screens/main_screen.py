@@ -31,7 +31,11 @@ class Main_Screen:
         if is_correct:
             correct_value = self._game_process.get_num_field_value(row, col)
             self._num_buttons[row][col]["text"] = str(correct_value)
-        self._update_status_label()
+        self._update_status()
+
+    def get_is_in_progress(self):
+        return self._is_in_progress
+
 
     def run(self, difficulty: str):
         if self._game_process:
@@ -80,7 +84,7 @@ class Main_Screen:
         status_label.grid(row=0, column=1, rowspan=1, sticky=NS, padx=5)
 
         self._status_label = status_label
-        self._update_status_label()
+        self._update_status()
 
     def _draw_num_field(self):
         if self._game_process is None:
@@ -115,7 +119,7 @@ class Main_Screen:
                 row_buttons.append(btn)
             self._num_buttons.append(row_buttons)
 
-    def _update_status_label(self):
+    def _update_status(self):
         if self._game_process is None:
             return
         left_elements = self._game_process.get_unknown_elements_count()
