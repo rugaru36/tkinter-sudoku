@@ -2,7 +2,7 @@ from tkinter import EW, Button, Entry, Label, Toplevel
 from typing import Callable
 
 
-class Value_Input:
+class Value_Input_Screen:
     def __init__(self) -> None:
         self._root_widget: Toplevel | None = None
         self._is_valid_value: bool = False

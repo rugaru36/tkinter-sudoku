@@ -3,7 +3,7 @@ from typing import Final
 
 from presentation.screens.difficulty_select_screen import Difficulty_Select_Screen
 from presentation.screens.main_screen import Main_Screen
-from presentation.screens.value_input import Value_Input
+from presentation.screens.value_input_screen import Value_Input_Screen
 
 
 class Game_Presentation:
@@ -11,7 +11,7 @@ class Game_Presentation:
         self._difficulty_select_screen: Final = Difficulty_Select_Screen()
         self._main_screen: Final = Main_Screen(
             self._on_element_select, self.run)
-        self._input_screen: Final = Value_Input()
+        self._input_screen: Final = Value_Input_Screen()
 
         self._selected_difficulty_level: str | None = None
         pass
