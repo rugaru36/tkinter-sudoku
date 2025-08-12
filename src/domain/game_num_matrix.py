@@ -4,23 +4,23 @@ from typing import Final
 from lib.shift_looped_sequence import shift_looped_sequence
 
 
-class Num_Field:
+class Game_Num_Matrix:
 
     def __init__(self) -> None:
         self._matrix: list[list[int]] = []
-        self._generate_game_matrix()
+        # self._generate_game_matrix()
 
-    def reload(self):
+    def generate(self):
         self._matrix = []
         self._generate_game_matrix()
 
-    def get_matrix_size(self):
+    def get_size(self):
         return len(self._matrix)
 
     def get_matrix(self):
         return self._matrix
 
-    def get_matrix_val(self, row: int, col: int):
+    def get_single_val(self, row: int, col: int):
         return self._matrix[row][col]
 
     def _generate_game_matrix(self):

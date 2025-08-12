@@ -17,6 +17,7 @@ class Main_Screen:
         self._selected_row: int | None = None
         self._selected_col: int | None = None
         self._is_in_progress: bool = True
+        self._left_seconds_time: int = -1
 
         self._status_label: Label | None = None
 
@@ -36,13 +37,12 @@ class Main_Screen:
     def get_is_in_progress(self):
         return self._is_in_progress
 
-
     def run(self, difficulty: str):
         if self._game_process:
-            self._game_process.reload(difficulty)
             self._reload_values_to_default()
         else:
-            self._game_process = Game_Process(difficulty)
+            self._game_process = Game_Process(self._update_status)
+        self._game_process.start(difficulty)
         self._show()
 
     def _on_element_select(self, row: int, col: int):
@@ -56,14 +56,15 @@ class Main_Screen:
         self._cb_on_element_selected()
 
     def _on_reload(self):
+        self._on_destroy()
         if self._root_widget is not None:
-            self._root_widget.destroy()
             self._root_widget = None
         self._cb_on_reload()
 
     def _show(self):
         window = Tk()
         window.resizable(False, False)
+        window.protocol("WM_DELETE_WINDOW", self._on_destroy)
 
         self._draw_top_menu()
         self._draw_num_field()
@@ -71,6 +72,7 @@ class Main_Screen:
         window.title("Game")
 
         self._root_widget = window
+        self._update_status()
         window.mainloop()
 
     def _draw_top_menu(self):
@@ -123,12 +125,25 @@ class Main_Screen:
         if self._game_process is None:
             return
         left_elements = self._game_process.get_unknown_elements_count()
-        # left
         left_mistakes = self._game_process.get_left_mistakes()
-        status = Game_Status.get_status(left_elements, left_mistakes)
-        if self._status_label is not None:
-            self._status_label["text"] = f"Game status: {status}.\nLeft to fill: {left_elements}\nMistakes left: {left_mistakes}"
+        left_seconds_time_total = self._game_process.get_time_left()
+        left_mins, left_seconds = divmod(left_seconds_time_total, 60)
+
+        status = Game_Status.get_status(
+            left_elements, left_mistakes, left_seconds_time_total)
+
+        try:
+            if self._status_label is not None and self._root_widget is not None:
+                self._status_label["text"] = f"Time left: {left_mins}:{left_seconds}.\nLeft to fill: {left_elements}\nMistakes left: {left_mistakes}"
+        except:
+            pass
         self._is_in_progress = status == Game_Status.in_process
+
+    def _on_destroy(self):
+        if self._game_process is not None:
+            self._game_process.stop()
+        if self._root_widget is not None:
+            self._root_widget.destroy()
 
     def _reload_values_to_default(self):
         if self._root_widget:

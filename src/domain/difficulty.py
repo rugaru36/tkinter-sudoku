@@ -11,17 +11,21 @@ class Difficulty:
         match name:
             case Difficulty.easy:
                 return {
-                    "count_of_unknown_elements": 1,
+                    "name": name,
+                    "time_seconds": 15 * 60,
+                    "count_of_unknown_elements": 15,
                     "count_of_mistakes": 10}
             case Difficulty.mid:
                 return {
-                    "name": "Medium",
+                    "name": name,
+                    "time_seconds": 10 * 60,
                     "count_of_unknown_elements": 25,
                     "count_of_mistakes": 7
                 }
             case Difficulty.hard:
                 return {
-                    "name": "Hard",
+                    "name": name,
+                    "time_seconds": 5 * 60,
                     "count_of_unknown_elements": 40,
                     "count_of_mistakes": 4
                 }
