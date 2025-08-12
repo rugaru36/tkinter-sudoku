@@ -4,6 +4,8 @@ from threading import Thread
 from time import sleep
 from typing import Callable, Final, Never
 
+# Timer based on threads
+
 
 class Timer:
     def __init__(self, delay: int, callback: Callable[[], None] | None = None, name: str | None = None):
@@ -26,7 +28,6 @@ class Timer:
     def _init_thread(self):
         self._thread = Thread(name=self._name)
         self._thread.run = self._tick_iterations
-        self._thread.daemon = True
         if self._name:
             self._thread.name = self._name
         self._thread.start()
