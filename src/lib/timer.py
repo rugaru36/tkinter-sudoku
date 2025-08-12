@@ -1,18 +1,14 @@
-import asyncio
-# from contextlib import suppress
 from threading import Thread
 from time import sleep
-from typing import Callable, Final, Never
+from typing import Callable, Final
 
 # Timer based on threads
 
 
 class Timer:
     def __init__(self, delay: int, callback: Callable[[], None] | None = None, name: str | None = None):
-        self._loop: Final = asyncio.get_event_loop()
         self._name: Final = name
         self._on_tick_cb: Final = callback
-        self._task: asyncio.Task[Never] | None = None
         self._delay: Final = delay
         self._is_running: bool = False
         self._thread: Thread | None = None
