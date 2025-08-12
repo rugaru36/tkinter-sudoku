@@ -34,7 +34,7 @@ class Game_Process:
         self._timer.stop()
 
     def on_new_value(self, value: int, row: int, col: int) -> bool:
-        if self._is_in_progress:
+        if not self._is_in_progress:
             return False
 
         is_actually_unknown = self._filling_state.check_is_actually_unknown(
