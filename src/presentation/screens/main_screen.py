@@ -1,16 +1,33 @@
 from math import sqrt
-from tkinter import NS, W, Button, Frame, Label, Tk
+from tkinter import NS, W, Button, Frame, Label, Menu, Tk
+from tkinter.messagebox import askyesno
 from typing import Callable, Final
+from domain.difficulty import Difficulty
 from domain.game_process import Game_Process
 from domain.game_status import Game_Status
+from presentation.locales.locale_manager import Locale_Info
 
 
 class Main_Screen:
 
-    def __init__(self, cb_on_element_selected: Callable[[], None], cb_on_reload: Callable[[], None], get_text_cb: Callable[[str], str]) -> None:
-        self._cb_on_element_selected: Final = cb_on_element_selected
-        self._cb_on_reload: Final = cb_on_reload
-        self._get_text_cb: Final = get_text_cb
+    def __init__(self,
+                 locale_info_list: list[Locale_Info],
+                 cb_on_element_selected: Callable[[], None],
+                 cb_on_reload: Callable[[], None],
+                 cb_get_text: Callable[[str], str],
+                 cb_change_locale: Callable[[str], None],
+                 cb_change_difficulty: Callable[[str], None]
+                 ) -> None:
+        self._cb_on_element_selected: Callable[[
+        ], None] = cb_on_element_selected
+        self._cb_on_reload: Callable[[], None] = cb_on_reload
+        self._cb_get_text: Callable[[str], str] = cb_get_text
+        self._cb_change_locale: Callable[[str], None] = cb_change_locale
+        self._cb_change_difficulty: Callable[[
+            str], None] = cb_change_difficulty
+
+        self._difficulty: str | None = None
+        self._locale_info_list: Final = locale_info_list
 
         self._root_widget: None | Tk = None
         self._num_buttons: list[list[Button]] = []
@@ -39,6 +56,7 @@ class Main_Screen:
         return self._is_in_progress
 
     def run(self, difficulty: str):
+        self._difficulty = difficulty
         if self._game_process:
             self._reload_values_to_default()
         else:
@@ -54,7 +72,8 @@ class Main_Screen:
             return
         self._selected_row = row
         self._selected_col = col
-        self._cb_on_element_selected()
+        if not self._cb_on_element_selected is None:
+            self._cb_on_element_selected()
 
     def _on_reload(self):
         self._on_destroy()
@@ -67,20 +86,42 @@ class Main_Screen:
         window.resizable(False, False)
         window.protocol("WM_DELETE_WINDOW", self._on_destroy)
 
-        self._draw_top_menu()
+        self._draw_status_row()
         self._draw_num_field()
 
-        window.title(self._get_text_cb("main_screen.title"))
+        window.title(self._cb_get_text("main_screen.title"))
 
         self._root_widget = window
         self._update_status()
+        self._draw_top_menu()
         window.mainloop()
 
     def _draw_top_menu(self):
+        if self._root_widget is not None:
+            main_menu = Menu()
+
+            diff_menu = Menu(tearoff=0)
+            diff_menu.add_command(
+                label="Easy", command=lambda: self._on_change_difficulty(Difficulty.easy))
+            diff_menu.add_command(
+                label="Mid", command=lambda: self._on_change_difficulty(Difficulty.mid))
+            diff_menu.add_command(
+                label="Hard", command=lambda: self._on_change_difficulty(Difficulty.hard))
+
+            locale_menu = Menu(tearoff=0)
+            for locale_info in self._locale_info_list:
+                locale_menu.add_command(
+                    label=locale_info.name, command=lambda code=locale_info.code: self._cb_change_locale(code))
+
+            main_menu.add_cascade(label="Difficulty", menu=diff_menu)
+            main_menu.add_cascade(label="Locale", menu=locale_menu)
+            _ = self._root_widget.config(menu=main_menu)
+
+    def _draw_status_row(self):
         frame = Frame(self._root_widget, padx=5, pady=5)
         frame.grid(row=0, column=0, columnspan=3, sticky=W)
 
-        reload_btn = Button(frame, text=self._get_text_cb(
+        reload_btn = Button(frame, text=self._cb_get_text(
             "main_screen.reload"), command=self._on_reload)
         reload_btn.grid(row=0, column=0, rowspan=1, ipady=15)
 
@@ -134,9 +175,9 @@ class Main_Screen:
         status = Game_Status.get_status(
             left_elements, left_mistakes, left_seconds_time_total)
 
-        time_msg = f"{self._get_text_cb("main_screen.time_left_msg")}: {left_mins}:{left_seconds}"
-        tries_msg = f"{self._get_text_cb("main_screen.tries_left_msg")}: {left_mistakes}"
-        left_to_fill_msg = f"{self._get_text_cb("main_screen.empty_left_msg")}: {left_elements}"
+        time_msg = f"{self._cb_get_text("main_screen.time_left_msg")}: {left_mins}:{left_seconds}"
+        tries_msg = f"{self._cb_get_text("main_screen.tries_left_msg")}: {left_mistakes}"
+        left_to_fill_msg = f"{self._cb_get_text("main_screen.empty_left_msg")}: {left_elements}"
 
         try:
             if self._status_label is not None and self._root_widget is not None:
@@ -150,6 +191,12 @@ class Main_Screen:
             self._game_process.stop()
         if self._root_widget is not None:
             self._root_widget.destroy()
+
+    def _on_change_difficulty(self, new_value: str):
+        if new_value == self._difficulty:
+            return
+        is_change_confirmed = askyesno("u sure?", "ar u sure bout dis?")
+        if is_change_confirmed: self._cb_change_difficulty(new_value)
 
     def _reload_values_to_default(self):
         if self._root_widget:

@@ -12,13 +12,20 @@ from presentation.screens.value_input_screen import Validation_Types, Value_Inpu
 class Game_Presentation:
     def __init__(self) -> None:
         self._locale_manager: Final = Locale_Manager()
+        locale_info_list = self._locale_manager.get_locale_info_list()
 
         self._select_locale_screen: Final = Locale_Select_Screen(
-            self._locale_manager.get_locale_info_list())
+            locale_info_list)
         self._difficulty_select_screen: Final = Difficulty_Select_Screen(
             self._locale_manager.get_value)
         self._main_screen: Final = Main_Screen(
-            self._on_element_select, self.reload, self._locale_manager.get_value)
+            locale_info_list,
+            self._on_element_select,
+            self._on_reload,
+            self._locale_manager.get_value,
+            self._on_change_locale,
+            self._on_change_difficulty
+        )
         self._config_manager: Final = Config_Manager()
 
         self._selected_difficulty: str | None = self._config_manager.get_difficulty_level()
@@ -29,11 +36,6 @@ class Game_Presentation:
         self._num_value_input_screen.set_validation_options(
             Validation_Types.only_digits, 1, 1)
 
-    def reload(self):
-        self._selected_locale_code = None
-        self._selected_difficulty = None
-        self.run()
-
     def run(self):
         if self._selected_locale_code is None:
             self._select_locale()
@@ -42,6 +44,17 @@ class Game_Presentation:
         if self._selected_difficulty is None:
             self._select_difficulty()
         self._run_main_screen()
+
+    def _on_reload(self):
+        # self._selected_locale_code = None
+        # self._selected_difficulty = None
+        self.run()
+
+    def _on_change_locale(self, locale_code: str):
+        pass
+
+    def _on_change_difficulty(self, difficulty: str):
+        pass
 
     def _select_locale(self):
         self._selected_locale_code = self._select_locale_screen.run()
