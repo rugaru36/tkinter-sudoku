@@ -23,8 +23,7 @@ class Value_Input_Screen:
         self._cb_get_text: Final = get_text_cb
         pass
 
-    def run(self,
-            ):
+    def run(self):
         self._show()
 
     def set_validation_options(self, validation_type: str, min_length: int = -1, max_length: int = 99999999999):
