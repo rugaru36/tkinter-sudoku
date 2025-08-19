@@ -1,6 +1,6 @@
 from math import sqrt
 from tkinter import NS, W, Button, Frame, Label, Menu, Tk
-from tkinter.messagebox import askyesno
+from tkinter.messagebox import askyesno, showinfo
 from typing import Callable, Final
 from domain.difficulty import Difficulty
 from domain.game_process import Game_Process
@@ -194,14 +194,19 @@ class Main_Screen:
 
     def _on_change_difficulty(self, new_value: str):
         if new_value == self._difficulty:
+            _ = showinfo("same diff", "da same diff bro")
             return
         is_change_confirmed = askyesno("u sure?", "ar u sure bout dis?")
-        if is_change_confirmed: self._cb_change_difficulty(new_value)
+        if is_change_confirmed: 
+            self._reload_values_to_default()
+            self._cb_change_difficulty(new_value)
 
     def _reload_values_to_default(self):
         if self._root_widget:
             self._root_widget.destroy()
             self._root_widget = None
+        if not self._game_process is None:
+            self._game_process.stop()
         self._num_buttons = []
         self._selected_row = None
         self._selected_col = None
