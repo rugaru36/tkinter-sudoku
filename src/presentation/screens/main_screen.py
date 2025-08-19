@@ -7,9 +7,10 @@ from domain.game_status import Game_Status
 
 class Main_Screen:
 
-    def __init__(self, cb_on_element_selected: Callable[[], None], cb_on_reload: Callable[[], None]) -> None:
+    def __init__(self, cb_on_element_selected: Callable[[], None], cb_on_reload: Callable[[], None], get_text_cb: Callable[[str], str]) -> None:
         self._cb_on_element_selected: Final = cb_on_element_selected
         self._cb_on_reload: Final = cb_on_reload
+        self._get_text_cb: Final = get_text_cb
 
         self._root_widget: None | Tk = None
         self._num_buttons: list[list[Button]] = []
@@ -69,7 +70,7 @@ class Main_Screen:
         self._draw_top_menu()
         self._draw_num_field()
 
-        window.title("Game")
+        window.title(self._get_text_cb("main_screen.title"))
 
         self._root_widget = window
         self._update_status()
@@ -79,7 +80,8 @@ class Main_Screen:
         frame = Frame(self._root_widget, padx=5, pady=5)
         frame.grid(row=0, column=0, columnspan=3, sticky=W)
 
-        reload_btn = Button(frame, text="Reload", command=self._on_reload)
+        reload_btn = Button(frame, text=self._get_text_cb(
+            "main_screen.reload"), command=self._on_reload)
         reload_btn.grid(row=0, column=0, rowspan=1, ipady=15)
 
         status_label = Label(frame, text="", justify="left")
@@ -132,9 +134,13 @@ class Main_Screen:
         status = Game_Status.get_status(
             left_elements, left_mistakes, left_seconds_time_total)
 
+        time_msg = f"{self._get_text_cb("main_screen.time_left_msg")}: {left_mins}:{left_seconds}"
+        tries_msg = f"{self._get_text_cb("main_screen.tries_left_msg")}: {left_mistakes}"
+        left_to_fill_msg = f"{self._get_text_cb("main_screen.empty_left_msg")}: {left_elements}"
+
         try:
             if self._status_label is not None and self._root_widget is not None:
-                self._status_label["text"] = f"Time left: {left_mins}:{left_seconds}.\nLeft to fill: {left_elements}\nMistakes left: {left_mistakes}"
+                self._status_label["text"] = f"{time_msg}\n{left_to_fill_msg}\n{tries_msg}"
         except:
             pass
         self._is_in_progress = status == Game_Status.in_process

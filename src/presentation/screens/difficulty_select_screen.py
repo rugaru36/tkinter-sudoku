@@ -1,14 +1,17 @@
 from tkinter import NSEW, Button, Tk
+from typing import Callable, Final
 
 from domain.difficulty import Difficulty
 
 
 class Difficulty_Select_Screen:
-    def __init__(self) -> None:
+    def __init__(self, get_text_cb: Callable[[str], str]) -> None:
         self._root_widget: Tk | None = None
         self._selected_difficulty: str | None = None
+        self._get_text_cb: Final = get_text_cb
 
     def run(self):
+        self._selected_difficulty = None
         self._show()
         return self._selected_difficulty
 
@@ -16,13 +19,13 @@ class Difficulty_Select_Screen:
         window = Tk()
         window.resizable(False, False)
 
-        window.title("Select difficulty")
+        window.title(self._get_text_cb("select_diff.title"))
 
-        easy_btn = Button(text=Difficulty.easy,
+        easy_btn = Button(text=self._get_text_cb("select_diff.easy"),
                           command=lambda: self._on_select(Difficulty.easy))
-        mid_btn = Button(text=Difficulty.mid,
+        mid_btn = Button(text=self._get_text_cb("select_diff.mid"),
                          command=lambda: self._on_select(Difficulty.mid))
-        hard_btn = Button(text=Difficulty.hard,
+        hard_btn = Button(text=self._get_text_cb("select_diff.hard"),
                           command=lambda: self._on_select(Difficulty.hard))
 
         easy_btn.grid(row=0, column=0, columnspan=10, ipadx=100,

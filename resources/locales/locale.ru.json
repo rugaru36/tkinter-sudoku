@@ -1,0 +1,18 @@
+{
+    "select_diff.title": "Выберите сложность",
+    "select_diff.easy": "Лёгкая",
+    "select_diff.mid": "Средняя",
+    "select_diff.hard": "Сложная",
+
+    "main_screen.title": "Судоку",
+    "main_screen.reload": "Перезапустить",
+    "main_screen.time_left_msg": "Осталось времени",
+    "main_screen.tries_left_msg": "Попытки",
+    "main_screen.empty_left_msg": "Незаполненные поля",
+    
+    "input_num_value.title": "Введите значение",
+    "input_num_value.msg": "Введите значение (число от 1 до 9)",
+    "input_num_value.invalid_value_title": "Внимание",
+    "input_num_value.invalid_value_msg": "Неверное значение!",
+    "input_num_value.on_confirm": "Подтвердить"
+}

@@ -1,0 +1,18 @@
+{
+    "select_diff.title": "Difficulty",
+    "select_diff.easy": "Easy",
+    "select_diff.mid": "Medium",
+    "select_diff.hard": "Hard",
+
+    "main_screen.title": "Sudoku",
+    "main_screen.reload": "Reload game",
+    "main_screen.time_left_msg": "Time remaining",
+    "main_screen.tries_left_msg": "Tries left",
+    "main_screen.empty_left_msg": "Empty fields left",
+    
+    "input_num_value.title": "Input value",
+    "input_num_value.msg": "Input value (num from 1 to 9)",
+    "input_num_value.invalid_value_title": "Attention",
+    "input_num_value.invalid_value_msg": "Invalid value!",
+    "input_num_value.on_confirm": "Confirm"
+}

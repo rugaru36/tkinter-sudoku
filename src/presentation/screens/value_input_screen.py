@@ -10,25 +10,21 @@ class Validation_Types:
 
 class Value_Input_Screen:
 
-    def __init__(self, cb_on_input: Callable[[str | None], None],) -> None:
-        self._message_label_text: str = ''
-        self._window_title_text: str = ''
+    def __init__(self, cb_on_confirm: Callable[[str | None], None], get_text_cb: Callable[[str], str], screen_code: str = "") -> None:
         self._root_widget: Tk | None = None
         self._is_valid_value: bool = False
         self._value: str = ''
         self._message_label: Label | None = None
-        self._cb_on_input: Callable[[str | None], None] = cb_on_input
+        self._cb_on_confirm: Callable[[str | None], None] = cb_on_confirm
         self._validation_type: str = Validation_Types.random_characters
         self._min_value_lenght: int = -1
         self._max_value_lenght: int = 99999999999
+        self._screen_code: Final = screen_code
+        self._cb_get_text: Final = get_text_cb
         pass
 
     def run(self,
-            message_label_text: str,
-            window_title_text: str,
             ):
-        self._message_label_text = message_label_text
-        self._window_title_text = window_title_text
         self._show()
 
     def set_validation_options(self, validation_type: str, min_length: int = -1, max_length: int = 99999999999):
@@ -37,7 +33,6 @@ class Value_Input_Screen:
         self._validation_type = validation_type
         self._min_value_lenght = min_length
         self._max_value_lenght = max_length
-        return self
 
     # True lets change input field value
     def _validate_value(self, value: str) -> bool:
@@ -69,9 +64,9 @@ class Value_Input_Screen:
         window = Tk()
         window.resizable(False, False)
         window.protocol("WM_DELETE_WINDOW", self._destroy_root_widget)
-        window.title(self._window_title_text)
+        window.title(self._get_text("title"))
 
-        message_label = Label(window, text=self._message_label_text)
+        message_label = Label(window, text=self._get_text("msg"))
         message_label.grid(row=0, column=0, columnspan=5,
                            ipadx=50, ipady=6, padx=4, pady=4, sticky=EW)
 
@@ -85,7 +80,8 @@ class Value_Input_Screen:
         entry.grid(row=1, column=0, columnspan=5, ipadx=50,
                    ipady=6, padx=4, pady=4, sticky=EW)
 
-        ok_btn = Button(window, text="Ok", command=self._on_ok)
+        ok_btn_msg = self._get_text("on_confirm")
+        ok_btn = Button(window, text=ok_btn_msg, command=self._on_confirm)
         ok_btn.grid(row=2, column=0, columnspan=5, ipadx=50,
                     ipady=6, padx=4, pady=4, sticky=EW)
 
@@ -94,16 +90,23 @@ class Value_Input_Screen:
 
         window.grab_set()
 
-    def _on_ok(self):
+    def _on_confirm(self):
         if self._is_valid_value and self._root_widget:
             self._destroy_root_widget()
-            if self._cb_on_input is not None:
-                self._cb_on_input(self._value)
+            if self._cb_on_confirm is not None:
+                self._cb_on_confirm(self._value)
         elif not self._is_valid_value:
-            _ = showwarning("Error", "Value is invalid!")
+            title = self._get_text("invalid_value_title")
+            msg = self._get_text("invalid_value_msg")
+            _ = showwarning(title, msg)
 
     def _destroy_root_widget(self):
         if self._root_widget is None:
             return
         self._root_widget.grab_release()
         self._root_widget.destroy()
+
+    def _get_text(self, key: str):
+        key_from_ext_text_storage = f"{self._screen_code}.{key}" if len(
+            self._screen_code) > 0 else key
+        return self._cb_get_text(key_from_ext_text_storage)
