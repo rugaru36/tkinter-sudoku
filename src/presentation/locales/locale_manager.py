@@ -9,6 +9,7 @@ class Locale_Info:
     def __init__(self, dict: dict[str, str] | None = None):
         self.name: str = "[locale_name]"
         self.code: str = "[locale_code]"
+        self.is_selected: bool = False
         if dict is not None:
             self.update_from_dict(dict)
 
@@ -29,12 +30,15 @@ class Locale_Manager:
         return self._locale_info_list
 
     def set_locale(self, code: str):
+        is_locale_found = False
         for locale_info in self._locale_info_list:
-            if locale_info.code == code:
+            locale_info.is_selected = locale_info.code == code
+            if locale_info.is_selected:
                 self._selected_locale_info = locale_info
                 self._load_locale_file()
-                return
-        self._selected_locale_info = None
+                is_locale_found = True
+        if not is_locale_found:
+            self._selected_locale_info = None
 
     def get_value(self, key: str):
         if key in self._selected_locale:

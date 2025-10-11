@@ -9,7 +9,9 @@
     "main_screen.time_left_msg": "Осталось времени",
     "main_screen.tries_left_msg": "Попытки",
     "main_screen.empty_left_msg": "Незаполненные поля",
-    
+    "main_screen.top_menu.lang": "Язык",
+    "main_screen.top_menu.difficulty": "Сложность",
+
     "input_num_value.title": "Введите значение",
     "input_num_value.msg": "Введите значение (число от 1 до 9)",
     "input_num_value.invalid_value_title": "Внимание",

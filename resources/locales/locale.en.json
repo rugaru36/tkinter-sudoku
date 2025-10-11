@@ -9,6 +9,8 @@
     "main_screen.time_left_msg": "Time remaining",
     "main_screen.tries_left_msg": "Tries left",
     "main_screen.empty_left_msg": "Empty fields left",
+    "main_screen.top_menu.lang": "Locale",
+    "main_screen.top_menu.difficulty": "Difficulty",
     
     "input_num_value.title": "Input value",
     "input_num_value.msg": "Input value (num from 1 to 9)",

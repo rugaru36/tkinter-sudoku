@@ -55,7 +55,7 @@ class Main_Screen:
     def get_is_in_progress(self):
         return self._is_in_progress
 
-    def run(self, difficulty: str):
+    def run_ui(self, difficulty: str):
         self._difficulty = difficulty
         if self._game_process:
             self._reload_values_to_default()
@@ -63,6 +63,17 @@ class Main_Screen:
             self._game_process = Game_Process(self._update_status)
         self._game_process.start(difficulty)
         self._show()
+
+    def reset_ui(self, difficulty_level: str | None = None):
+        if difficulty_level is not None:
+            self.run_ui(difficulty_level)
+        elif self._root_widget is not None:
+            self._root_widget.destroy()
+            self._root_widget = None
+            self._show()
+        elif self._difficulty is not None:
+            self.run_ui(self._difficulty)
+        return
 
     def _on_element_select(self, row: int, col: int):
         if self._game_process is None:
@@ -110,11 +121,14 @@ class Main_Screen:
 
             locale_menu = Menu(tearoff=0)
             for locale_info in self._locale_info_list:
+                label = locale_info.name
+                if locale_info.is_selected:
+                    label = "> " + label
                 locale_menu.add_command(
-                    label=locale_info.name, command=lambda code=locale_info.code: self._cb_change_locale(code))
+                    label=label, command=lambda code=locale_info.code: self._cb_change_locale(code))
 
-            main_menu.add_cascade(label="Difficulty", menu=diff_menu)
-            main_menu.add_cascade(label="Locale", menu=locale_menu)
+            main_menu.add_cascade(label=self._cb_get_text("main_screen.top_menu.difficulty"), menu=diff_menu)
+            main_menu.add_cascade(label=self._cb_get_text("main_screen.top_menu.lang"), menu=locale_menu)
             _ = self._root_widget.config(menu=main_menu)
 
     def _draw_status_row(self):
@@ -197,7 +211,7 @@ class Main_Screen:
             _ = showinfo("same diff", "da same diff bro")
             return
         is_change_confirmed = askyesno("u sure?", "ar u sure bout dis?")
-        if is_change_confirmed: 
+        if is_change_confirmed:
             self._reload_values_to_default()
             self._cb_change_difficulty(new_value)
 
