@@ -2,6 +2,7 @@ from math import sqrt
 from tkinter import NS, W, Button, Frame, Label, Menu, Tk
 from tkinter.messagebox import askyesno, showinfo
 from typing import Callable, Final
+from config.config_manager import Config_Manager
 from domain.difficulty import Difficulty
 from domain.game_process import Game_Process
 from domain.game_status import Game_Status
@@ -11,6 +12,7 @@ from presentation.locales.locale_manager import Locale_Info
 class Main_Screen:
 
     def __init__(self,
+                 config_manager: Config_Manager,
                  locale_info_list: list[Locale_Info],
                  cb_on_element_selected: Callable[[], None],
                  cb_on_reload: Callable[[], None],
@@ -18,15 +20,14 @@ class Main_Screen:
                  cb_change_locale: Callable[[str], None],
                  cb_change_difficulty: Callable[[str], None]
                  ) -> None:
-        self._cb_on_element_selected: Callable[[
-        ], None] = cb_on_element_selected
+        self._cb_on_element_selected: Callable[[], None] = cb_on_element_selected
         self._cb_on_reload: Callable[[], None] = cb_on_reload
         self._cb_get_text: Callable[[str], str] = cb_get_text
         self._cb_change_locale: Callable[[str], None] = cb_change_locale
-        self._cb_change_difficulty: Callable[[
-            str], None] = cb_change_difficulty
+        self._cb_change_difficulty: Callable[[str], None] = cb_change_difficulty
 
         self._difficulty: str | None = None
+        self._config_manager: Config_Manager = config_manager
         self._locale_info_list: Final = locale_info_list
 
         self._root_widget: None | Tk = None
@@ -64,7 +65,8 @@ class Main_Screen:
         self._game_process.start(difficulty)
         self._show()
 
-    def reset_ui(self, difficulty_level: str | None = None):
+    def reset_ui(self):
+        difficulty_level = self._config_manager.get_difficulty_level()
         if difficulty_level is not None:
             self.run_ui(difficulty_level)
         elif self._root_widget is not None:
@@ -125,10 +127,12 @@ class Main_Screen:
                 if locale_info.is_selected:
                     label = "> " + label
                 locale_menu.add_command(
-                    label=label, command=lambda code=locale_info.code: self._cb_change_locale(code))
+                    label=label, command=lambda code=locale_info.code: self._on_change_locale(code))
 
-            main_menu.add_cascade(label=self._cb_get_text("main_screen.top_menu.difficulty"), menu=diff_menu)
-            main_menu.add_cascade(label=self._cb_get_text("main_screen.top_menu.lang"), menu=locale_menu)
+            main_menu.add_cascade(label=self._cb_get_text(
+                "main_screen.top_menu.difficulty"), menu=diff_menu)
+            main_menu.add_cascade(label=self._cb_get_text(
+                "main_screen.top_menu.lang"), menu=locale_menu)
             _ = self._root_widget.config(menu=main_menu)
 
     def _draw_status_row(self):
@@ -214,6 +218,14 @@ class Main_Screen:
         if is_change_confirmed:
             self._reload_values_to_default()
             self._cb_change_difficulty(new_value)
+
+    def _on_change_locale(self, new_value: str):
+        for locale_info in self._locale_info_list:
+            if locale_info.code == new_value and locale_info.is_selected:
+                return
+            elif locale_info.code == new_value and not locale_info.is_selected:
+                break
+        self._cb_change_locale(new_value)
 
     def _reload_values_to_default(self):
         if self._root_widget:
