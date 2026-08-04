@@ -1,39 +1,15 @@
-from tkinter import NSEW, Button, Tk
+from tkinter import Tk
+from typing import Callable
 
 from presentation.locales.locale_manager import Locale_Info
+from presentation.screens.common.select_option_screen import Option, Select_Option_Screen
 
 
-class Locale_Select_Screen:
-    def __init__(self, locale_info_list: list[Locale_Info]) -> None:
+class Locale_Select_Screen(Select_Option_Screen[str]):
+    def __init__(self, get_text_cb: Callable[[str], str], locale_info_list: list[Locale_Info]) -> None:
         self._root_widget: Tk | None = None
         self._selected_locale: str | None = None
         self._locale_info_list: list[Locale_Info] = locale_info_list
-
-    def run(self):
-        self._selected_locale = None
-        self._show()
-        return self._selected_locale
-
-    def _show(self):
-        window = Tk()
-        window.resizable(False, False)
-
-        window.title("")
-        row = 0
-        for locale_info in self._locale_info_list:
-            btn = Button(text=locale_info.name,
-                              command=lambda code=locale_info.code: self._on_select(code))
-            btn.grid(row=row, column=0, columnspan=10, ipadx=100,
-                          ipady=6, padx=4, pady=4, sticky=NSEW)
-            row += 1
-
-        self._root_widget = window
-        window.mainloop()
-
-    def _on_select(self, locale: str):
-        self._selected_locale = locale
-        self._destroy_root_widget()
-
-    def _destroy_root_widget(self):
-        if self._root_widget is not None:
-            self._root_widget.destroy()
+        options = [Option(locale.name, locale.code)
+                   for locale in locale_info_list]
+        super().__init__(get_text_cb, "select_locale.title", options)

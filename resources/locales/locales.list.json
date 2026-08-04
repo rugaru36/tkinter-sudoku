@@ -2,7 +2,8 @@
     "locales": [
         {
             "name": "English",
-            "code": "en"
+            "code": "en",
+            "is_default": true
         },
         {
             "name": "Русский",

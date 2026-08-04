@@ -15,7 +15,9 @@ class Game_Presentation:
         locale_info_list = self._locale_manager.get_locale_info_list()
 
         self._select_locale_screen: Final = Locale_Select_Screen(
-            locale_info_list)
+            self._locale_manager.get_value,
+            locale_info_list
+        )
         self._difficulty_select_screen: Final = Difficulty_Select_Screen(
             self._locale_manager.get_value)
         self._config_manager: Final = Config_Manager()

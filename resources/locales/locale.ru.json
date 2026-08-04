@@ -1,4 +1,6 @@
 {
+    "select_locale.title": "Выберите язык",
+
     "select_diff.title": "Выберите сложность",
     "select_diff.easy": "Лёгкая",
     "select_diff.mid": "Средняя",

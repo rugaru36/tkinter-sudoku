@@ -4,7 +4,6 @@ from typing import Final
 
 from lib.file_system import read_file
 
-
 class Locale_Info:
     def __init__(self, dict: dict[str, str] | None = None):
         self.name: str = "[locale_name]"
@@ -21,6 +20,7 @@ class Locale_Manager:
     def __init__(self) -> None:
         self._locales_dir_path: Final = f"{os.getcwd()}/resources/locales"
         self._locale_info_list: list[Locale_Info] = []
+        self._default_locale: str | None = None
         self._load_locale_info_list()
 
         self._selected_locale_info: Locale_Info | None = None
@@ -56,6 +56,8 @@ class Locale_Manager:
         data_as_dict_list: list[dict[str, str]] = parsed_json["locales"]
         for data_as_dict in data_as_dict_list:
             self._locale_info_list.append(Locale_Info(data_as_dict))
+            if "is_default" in data_as_dict:
+                self.set_locale(data_as_dict["code"])
     
     def _load_locale_file(self):
         if self._selected_locale_info is None:
