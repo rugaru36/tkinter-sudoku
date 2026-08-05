@@ -1,19 +1,15 @@
 import json
 import os
-from typing import Final
+from typing import Final, TypedDict, cast
 
 from lib.file_system import read_file
 
-class Locale_Info:
-    def __init__(self, dict: dict[str, str] | None = None):
-        self.name: str = "[locale_name]"
-        self.code: str = "[locale_code]"
-        self.is_selected: bool = False
-        if dict is not None:
-            self.update_from_dict(dict)
 
-    def update_from_dict(self, dict: dict[str, str]):
-        self.__dict__.update(dict)
+class Locale_Info(TypedDict):
+    name: str
+    code: str
+    is_selected: bool
+    is_default: bool
 
 
 class Locale_Manager:
@@ -31,8 +27,8 @@ class Locale_Manager:
     def set_locale(self, code: str):
         is_locale_found = False
         for locale_info in self._locale_info_list:
-            locale_info.is_selected = locale_info.code == code
-            if locale_info.is_selected:
+            locale_info["is_selected"] = locale_info["code"] == code
+            if locale_info["is_selected"]:
                 self._selected_locale_info = locale_info
                 self._load_locale_file()
                 is_locale_found = True
@@ -51,20 +47,18 @@ class Locale_Manager:
         file_content = read_file(locales_list_file_path)
         if len(file_content) == 0:
             return
-        parsed_json: dict[str, list[dict[str, str]]] = json.loads(file_content)  # pyright: ignore[reportAny]
-        data_as_dict_list: list[dict[str, str]] = parsed_json["locales"]
-        for data_as_dict in data_as_dict_list:
-            self._locale_info_list.append(Locale_Info(data_as_dict))
+        self._locale_info_list = cast(
+            list[Locale_Info], json.loads(file_content)["locales"])
+        for data_as_dict in self._locale_info_list:
             if "is_default" in data_as_dict:
                 self.set_locale(data_as_dict["code"])
-    
+
     def _load_locale_file(self):
         if self._selected_locale_info is None:
             self._selected_locale = {}
             return
-        locale_file_name = f"locale.{self._selected_locale_info.code}.json"
+        locale_file_name = f"locale.{self._selected_locale_info["code"]}.json"
         locale_file_path = f"{self._locales_dir_path}/{locale_file_name}"
         file_content = read_file(locale_file_path)
         self._selected_locale = json.loads(file_content)
         pass
-
