@@ -21,10 +21,9 @@ class Locale_Manager:
         self._locales_dir_path: Final = f"{os.getcwd()}/resources/locales"
         self._locale_info_list: list[Locale_Info] = []
         self._default_locale: str | None = None
-        self._load_locale_info_list()
-
         self._selected_locale_info: Locale_Info | None = None
         self._selected_locale: dict[str, str] = {}
+        self._load_locale_info_list()
 
     def get_locale_info_list(self):
         return self._locale_info_list
@@ -67,4 +66,5 @@ class Locale_Manager:
         locale_file_path = f"{self._locales_dir_path}/{locale_file_name}"
         file_content = read_file(locale_file_path)
         self._selected_locale = json.loads(file_content)
+        pass
 
