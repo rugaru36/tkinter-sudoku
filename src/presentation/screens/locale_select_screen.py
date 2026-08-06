@@ -10,6 +10,6 @@ class Locale_Select_Screen(Select_Option_Screen[str]):
         self._root_widget: Tk | None = None
         self._selected_locale: str | None = None
         self._locale_info_list: list[Locale_Info] = locale_info_list
-        options = [Option(locale.name, locale.code)
+        options = [Option(locale["name"], locale["code"])
                    for locale in locale_info_list]
         super().__init__(get_text_cb, "select_locale.title", options)

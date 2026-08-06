@@ -123,11 +123,11 @@ class Main_Screen:
 
             locale_menu = Menu(tearoff=0)
             for locale_info in self._locale_info_list:
-                label = locale_info.name
-                if locale_info.is_selected:
+                label = locale_info["name"]
+                if locale_info["is_selected"]:
                     label = "> " + label
                 locale_menu.add_command(
-                    label=label, command=lambda code=locale_info.code: self._on_change_locale(code))
+                    label=label, command=lambda code=locale_info["code"]: self._on_change_locale(code))
 
             main_menu.add_cascade(label=self._cb_get_text(
                 "main_screen.top_menu.difficulty"), menu=diff_menu)
@@ -221,9 +221,9 @@ class Main_Screen:
 
     def _on_change_locale(self, new_value: str):
         for locale_info in self._locale_info_list:
-            if locale_info.code == new_value and locale_info.is_selected:
+            if locale_info["code"] == new_value and locale_info["is_selected"]:
                 return
-            elif locale_info.code == new_value and not locale_info.is_selected:
+            elif locale_info["code"] == new_value and not locale_info["is_selected"]:
                 break
         self._cb_change_locale(new_value)
 
