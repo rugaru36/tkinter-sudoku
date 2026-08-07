@@ -1,4 +1,9 @@
-from presentation.game_presentation import Game_Presentation
+from presentation.game_presentation import GamePresentation
 
-main_presentation = Game_Presentation()
-main_presentation.run()
+
+def main():
+    GamePresentation().run()
+
+
+if __name__ == "__main__":
+    main()

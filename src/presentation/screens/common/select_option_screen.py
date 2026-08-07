@@ -3,24 +3,24 @@ from typing import Final, Generic, TypeVar, Callable
 from tkinter import NSEW, Button, Tk
 
 
-option_type = TypeVar('option_type', str, bool, int)
+OptionType = TypeVar('OptionType', str, bool, int)
 
 
-class Option(Generic[option_type]):
-    def __init__(self, name: str, value: option_type) -> None:
+class Option(Generic[OptionType]):
+    def __init__(self, name: str, value: OptionType) -> None:
         self.name: Final = name
         self.value: Final = value
 
 
-class Select_Option_Screen(Generic[option_type]):
-    def __init__(self, get_text_cb: Callable[[str], str], title_name: str, options: list[Option[option_type]]) -> None:
+class SelectOptionScreen(Generic[OptionType]):
+    def __init__(self, get_text_cb: Callable[[str], str], title_name: str, options: list[Option[OptionType]]) -> None:
         self._root_widget: Tk | None = None
-        self._value: option_type | None = None
+        self._value: OptionType | None = None
         self._options: Final = options
         self._get_text_cb: Final = get_text_cb
         self._title_name: Final = title_name
 
-    def run(self) -> option_type | None:
+    def run(self) -> OptionType | None:
         self._value = None
         self._show()
         return self._value
@@ -42,7 +42,7 @@ class Select_Option_Screen(Generic[option_type]):
         self._root_widget = window
         window.mainloop()
 
-    def _on_select(self, new_value: option_type):
+    def _on_select(self, new_value: OptionType):
         self._value = new_value
         self._destroy_root_widget()
 

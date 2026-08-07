@@ -2,16 +2,13 @@ import os
 
 
 def read_file(file_path: str):
-    file = open(file_path, "r")
-    content = file.read()
-    file.close()
-    return content
+    with open(file_path, "r") as file:
+        return file.read()
 
 
 def write_file(file_path: str, content: str):
-    file = open(file_path, "w")
-    _ = file.write(content)
-    file.close()
+    with open(file_path, "w") as file:
+        _ = file.write(content)
 
 
 def ensure_file(file_path: str, default_file_content: str = ""):

@@ -1,25 +1,21 @@
 import random
-# state of fullfilling process
+# state of fulfilling process
 
 
-class Unknown_Elements_Storage:
+class UnknownElementsStorage:
     def __init__(self) -> None:
         self._unknown_elements_coordinates: list[list[int]] = []
-        # self._size_of_field: Final = size_of_field
-        # self._num_of_unknown_elements: Final = num_of_unknown
 
     def generate(self, num_of_unknown: int, size_of_field: int = 9):
         self._unknown_elements_coordinates = []
-        min = 0
-        max = size_of_field - 1
+        low = 0
+        high = size_of_field - 1
         for _ in range(num_of_unknown):
-            global row
-            global col
-            row = random.randint(min, max)
-            col = random.randint(min, max)
-            while self._get_unknown_element_index(row, col):
-                row = random.randint(min, max)
-                col = random.randint(min, max)
+            row = random.randint(low, high)
+            col = random.randint(low, high)
+            while self._get_unknown_element_index(row, col) is not None:
+                row = random.randint(low, high)
+                col = random.randint(low, high)
             self._unknown_elements_coordinates.append([row, col])
 
     def get_count(self):

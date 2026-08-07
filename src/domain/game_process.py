@@ -1,13 +1,13 @@
 from typing import Callable, Final
 from domain.difficulty import Difficulty
-from domain.game_num_matrix import Game_Num_Matrix
-from domain.unknown_elements import Unknown_Elements_Storage
+from domain.game_num_matrix import GameNumMatrix
+from domain.unknown_elements import UnknownElementsStorage
 from lib.timer import Timer
 
 # main interface for gui modules
 
 
-class Game_Process:
+class GameProcess:
     def __init__(self, cb_timer_tick_handler: Callable[[], None] | None = None) -> None:
         self._cb_timer_tick_handler: Final = cb_timer_tick_handler
         self._init_unknown_elements_count: int = 0
@@ -16,14 +16,14 @@ class Game_Process:
         self._left_seconds_time: int = -1
         self._timer: Final = Timer(1, self._timer_handler, 'game_timer')
 
-        self._diffculty_name: str = Difficulty.mid
-        self._game_num_matrix: Final = Game_Num_Matrix()
-        self._filling_state: Final = Unknown_Elements_Storage()
+        self._difficulty_name: str = Difficulty.mid
+        self._game_num_matrix: Final = GameNumMatrix()
+        self._filling_state: Final = UnknownElementsStorage()
 
         self._is_in_progress: bool = False
 
-    def start(self, diffculty_name: str):
-        self._diffculty_name = diffculty_name
+    def start(self, difficulty_name: str):
+        self._difficulty_name = difficulty_name
         self._parse_difficulty()
         self._is_in_progress = True
         self._filling_state.generate(self._init_unknown_elements_count)
@@ -77,7 +77,7 @@ class Game_Process:
         return self._filling_state.check_is_actually_unknown(row, col)
 
     def _parse_difficulty(self):
-        difficulty_data = Difficulty.get_dif_data(self._diffculty_name)
+        difficulty_data = Difficulty.get_dif_data(self._difficulty_name)
         self._mistakes_left = int(difficulty_data["count_of_mistakes"])
         self._init_unknown_elements_count = int(
             difficulty_data["count_of_unknown_elements"])

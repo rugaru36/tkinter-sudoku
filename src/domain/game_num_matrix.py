@@ -4,11 +4,10 @@ from typing import Final
 from lib.shift_looped_sequence import shift_looped_sequence
 
 
-class Game_Num_Matrix:
+class GameNumMatrix:
 
     def __init__(self) -> None:
         self._matrix: list[list[int]] = []
-        # self._generate_game_matrix()
 
     def generate(self):
         self._matrix = []
@@ -54,18 +53,18 @@ class Game_Num_Matrix:
                 self._swap_matrix_cols(diag_index, random_col_pair_to_swap)
                 self._swap_matrix_rows(diag_index, random_row_pair_to_swap)
 
-    def _swap_matrix_cols(self, sourceCol: int, targetCol: int) -> None:
-        if sourceCol == targetCol:
+    def _swap_matrix_cols(self, source_col: int, target_col: int) -> None:
+        if source_col == target_col:
             return
         for row in range(len(self._matrix)):
-            buff = self._matrix[row][targetCol]
-            self._matrix[row][targetCol] = self._matrix[row][sourceCol]
-            self._matrix[row][sourceCol] = buff
+            buff = self._matrix[row][target_col]
+            self._matrix[row][target_col] = self._matrix[row][source_col]
+            self._matrix[row][source_col] = buff
 
-    def _swap_matrix_rows(self, sourceRow: int, targetRow: int) -> None:
-        if sourceRow == targetRow:
+    def _swap_matrix_rows(self, source_row: int, target_row: int) -> None:
+        if source_row == target_row:
             return
         for col in range(len(self._matrix)):
-            buff = self._matrix[targetRow][col]
-            self._matrix[targetRow][col] = self._matrix[sourceRow][col]
-            self._matrix[sourceRow][col] = buff
+            buff = self._matrix[target_row][col]
+            self._matrix[target_row][col] = self._matrix[source_row][col]
+            self._matrix[source_row][col] = buff

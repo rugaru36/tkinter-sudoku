@@ -3,12 +3,12 @@ from typing import Callable, Final
 from tkinter.messagebox import showwarning
 
 
-class Validation_Types:
+class ValidationTypes:
     only_digits: Final = "Only Digits"
     random_characters: Final = 'Random Characters'
 
 
-class Value_Input_Screen:
+class ValueInputScreen:
 
     def __init__(self, cb_on_confirm: Callable[[str | None], None], get_text_cb: Callable[[str], str], screen_code: str = "") -> None:
         self._root_widget: Tk | None = None
@@ -16,12 +16,11 @@ class Value_Input_Screen:
         self._value: str = ''
         self._message_label: Label | None = None
         self._cb_on_confirm: Callable[[str | None], None] = cb_on_confirm
-        self._validation_type: str = Validation_Types.random_characters
-        self._min_value_lenght: int = -1
-        self._max_value_lenght: int = 99999999999
+        self._validation_type: str = ValidationTypes.random_characters
+        self._min_value_length: int = -1
+        self._max_value_length: int = 99999999999
         self._screen_code: Final = screen_code
         self._cb_get_text: Final = get_text_cb
-        pass
 
     def run(self):
         self._show()
@@ -30,14 +29,14 @@ class Value_Input_Screen:
         if min_length > max_length:
             raise ValueError("min_length > than max_length")
         self._validation_type = validation_type
-        self._min_value_lenght = min_length
-        self._max_value_lenght = max_length
+        self._min_value_length = min_length
+        self._max_value_length = max_length
 
     # True lets change input field value
     def _validate_value(self, value: str) -> bool:
         value_length = len(value)
-        is_shorter_than_min = value_length < self._min_value_lenght
-        is_longer_than_max = value_length > self._max_value_lenght
+        is_shorter_than_min = value_length < self._min_value_length
+        is_longer_than_max = value_length > self._max_value_length
         is_empty = value_length == 0
 
         self._is_valid_value = not (is_shorter_than_min or is_longer_than_max)
@@ -47,12 +46,12 @@ class Value_Input_Screen:
         elif not self._is_valid_value:
             return False
         match self._validation_type:
-            case Validation_Types.only_digits:
+            case ValidationTypes.only_digits:
                 is_valid_as_int = value.isnumeric()
                 self._is_valid_value = is_valid_as_int
                 if is_valid_as_int:
                     self._value = value
-            case Validation_Types.random_characters:
+            case ValidationTypes.random_characters:
                 self._value = value
             case _:
                 raise ValueError('unknown validation type: ' +

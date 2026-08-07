@@ -5,19 +5,19 @@ from typing import Final, TypedDict, cast
 from lib.file_system import read_file
 
 
-class Locale_Info(TypedDict):
+class LocaleInfo(TypedDict):
     name: str
     code: str
     is_selected: bool
     is_default: bool
 
 
-class Locale_Manager:
+class LocaleManager:
     def __init__(self) -> None:
         self._locales_dir_path: Final = f"{os.getcwd()}/resources/locales"
-        self._locale_info_list: list[Locale_Info] = []
+        self._locale_info_list: list[LocaleInfo] = []
         self._default_locale: str | None = None
-        self._selected_locale_info: Locale_Info | None = None
+        self._selected_locale_info: LocaleInfo | None = None
         self._selected_locale: dict[str, str] = {}
         self._load_locale_info_list()
 
@@ -48,7 +48,7 @@ class Locale_Manager:
         if len(file_content) == 0:
             return
         self._locale_info_list = cast(
-            list[Locale_Info], json.loads(file_content)["locales"])
+            list[LocaleInfo], json.loads(file_content)["locales"])
         for data_as_dict in self._locale_info_list:
             if "is_default" in data_as_dict:
                 self.set_locale(data_as_dict["code"])

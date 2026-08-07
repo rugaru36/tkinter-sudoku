@@ -1,19 +1,19 @@
 from math import sqrt
-from tkinter import NS, W, Button, Frame, Label, Menu, Tk
+from tkinter import NS, W, Button, Frame, Label, Menu, TclError, Tk
 from tkinter.messagebox import askyesno, showinfo
 from typing import Callable, Final
-from config.config_manager import Config_Manager
+from config.config_manager import ConfigManager
 from domain.difficulty import Difficulty
-from domain.game_process import Game_Process
-from domain.game_status import Game_Status
-from presentation.locales.locale_manager import Locale_Info
+from domain.game_process import GameProcess
+from domain.game_status import GameStatus
+from presentation.locales.locale_manager import LocaleInfo
 
 
-class Main_Screen:
+class MainScreen:
 
     def __init__(self,
-                 config_manager: Config_Manager,
-                 locale_info_list: list[Locale_Info],
+                 config_manager: ConfigManager,
+                 locale_info_list: list[LocaleInfo],
                  cb_on_element_selected: Callable[[], None],
                  cb_on_reload: Callable[[], None],
                  cb_get_text: Callable[[str], str],
@@ -27,12 +27,12 @@ class Main_Screen:
         self._cb_change_difficulty: Callable[[str], None] = cb_change_difficulty
 
         self._difficulty: str | None = None
-        self._config_manager: Config_Manager = config_manager
+        self._config_manager: ConfigManager = config_manager
         self._locale_info_list: Final = locale_info_list
 
         self._root_widget: None | Tk = None
         self._num_buttons: list[list[Button]] = []
-        self._game_process: Game_Process | None = None
+        self._game_process: GameProcess | None = None
         self._selected_row: int | None = None
         self._selected_col: int | None = None
         self._is_in_progress: bool = True
@@ -61,7 +61,7 @@ class Main_Screen:
         if self._game_process:
             self._reload_values_to_default()
         else:
-            self._game_process = Game_Process(self._update_status)
+            self._game_process = GameProcess(self._update_status)
         self._game_process.start(difficulty)
         self._show()
 
@@ -85,7 +85,7 @@ class Main_Screen:
             return
         self._selected_row = row
         self._selected_col = col
-        if not self._cb_on_element_selected is None:
+        if self._cb_on_element_selected is not None:
             self._cb_on_element_selected()
 
     def _on_reload(self):
@@ -190,7 +190,7 @@ class Main_Screen:
         left_seconds_time_total = self._game_process.get_time_left()
         left_mins, left_seconds = divmod(left_seconds_time_total, 60)
 
-        status = Game_Status.get_status(
+        status = GameStatus.get_status(
             left_elements, left_mistakes, left_seconds_time_total)
 
         time_msg = f"{self._cb_get_text("main_screen.time_left_msg")}: {left_mins}:{left_seconds}"
@@ -200,9 +200,9 @@ class Main_Screen:
         try:
             if self._status_label is not None and self._root_widget is not None:
                 self._status_label["text"] = f"{time_msg}\n{left_to_fill_msg}\n{tries_msg}"
-        except:
+        except TclError:
             pass
-        self._is_in_progress = status == Game_Status.in_process
+        self._is_in_progress = status == GameStatus.in_process
 
     def _on_destroy(self):
         if self._game_process is not None:
@@ -231,7 +231,7 @@ class Main_Screen:
         if self._root_widget:
             self._root_widget.destroy()
             self._root_widget = None
-        if not self._game_process is None:
+        if self._game_process is not None:
             self._game_process.stop()
         self._num_buttons = []
         self._selected_row = None

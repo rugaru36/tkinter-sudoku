@@ -4,8 +4,8 @@ from typing import Final, cast
 from lib.file_system import ensure_file, read_file, write_file
 
 
-class Config_Data:
-    def __init__(self, kwargs: dict[str, str] | None = None) -> None:
+class ConfigData:
+    def __init__(self) -> None:
         self.difficulty_level: str | None = None
         self.locale: str | None = None
 
@@ -13,14 +13,14 @@ class Config_Data:
         self.__dict__.update(data)
 
 
-class Config_Manager:
+class ConfigManager:
     def __init__(self) -> None:
         config_file_name = "config.json"
         self._config_file_path: Final = f"{os.getcwd()}/{config_file_name}"
 
         ensure_file(self._config_file_path, "{}")
 
-        self._config: Final = Config_Data()
+        self._config: Final = ConfigData()
         self._load_config_file()
 
     def get_difficulty_level(self) -> str | None:

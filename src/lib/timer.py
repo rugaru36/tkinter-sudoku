@@ -22,10 +22,7 @@ class Timer:
         self._is_running = False
 
     def _init_thread(self):
-        self._thread = Thread(name=self._name)
-        self._thread.run = self._tick_iterations
-        if self._name:
-            self._thread.name = self._name
+        self._thread = Thread(target=self._tick_iterations, name=self._name)
         self._thread.start()
 
     def _tick_iterations(self):

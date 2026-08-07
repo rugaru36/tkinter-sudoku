@@ -1,10 +1,10 @@
 from typing import Callable
 
 from domain.difficulty import Difficulty
-from presentation.screens.common.select_option_screen import Option, Select_Option_Screen
+from presentation.screens.common.select_option_screen import Option, SelectOptionScreen
 
 
-class Difficulty_Select_Screen(Select_Option_Screen[str]):
+class DifficultySelectScreen(SelectOptionScreen[str]):
     def __init__(self, get_text_cb: Callable[[str], str]) -> None:
         super().__init__(get_text_cb, "select_diff.title", [
             Option("select_diff.easy", Difficulty.easy),

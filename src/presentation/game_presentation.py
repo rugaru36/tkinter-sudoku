@@ -1,27 +1,27 @@
 import sys
 from typing import Final
 
-from config.config_manager import Config_Manager
-from presentation.locales.locale_manager import Locale_Manager
-from presentation.screens.difficulty_select_screen import Difficulty_Select_Screen
-from presentation.screens.locale_select_screen import Locale_Select_Screen
-from presentation.screens.main_screen import Main_Screen
-from presentation.screens.value_input_screen import Validation_Types, Value_Input_Screen
+from config.config_manager import ConfigManager
+from presentation.locales.locale_manager import LocaleManager
+from presentation.screens.difficulty_select_screen import DifficultySelectScreen
+from presentation.screens.locale_select_screen import LocaleSelectScreen
+from presentation.screens.main_screen import MainScreen
+from presentation.screens.value_input_screen import ValidationTypes, ValueInputScreen
 
 
-class Game_Presentation:
+class GamePresentation:
     def __init__(self) -> None:
-        self._locale_manager: Final = Locale_Manager()
+        self._locale_manager: Final = LocaleManager()
         locale_info_list = self._locale_manager.get_locale_info_list()
 
-        self._select_locale_screen: Final = Locale_Select_Screen(
+        self._select_locale_screen: Final = LocaleSelectScreen(
             self._locale_manager.get_value,
             locale_info_list
         )
-        self._difficulty_select_screen: Final = Difficulty_Select_Screen(
+        self._difficulty_select_screen: Final = DifficultySelectScreen(
             self._locale_manager.get_value)
-        self._config_manager: Final = Config_Manager()
-        self._main_screen: Final = Main_Screen(
+        self._config_manager: Final = ConfigManager()
+        self._main_screen: Final = MainScreen(
             self._config_manager,
             locale_info_list,
             self._on_element_select,
@@ -34,10 +34,10 @@ class Game_Presentation:
         self._selected_difficulty_level: str | None = self._config_manager.get_difficulty_level()
         self._selected_locale_code: str | None = self._config_manager.get_locale()
 
-        self._num_value_input_screen: Final = Value_Input_Screen(
+        self._num_value_input_screen: Final = ValueInputScreen(
             self._on_element_value, self._locale_manager.get_value, "input_num_value")
         self._num_value_input_screen.set_validation_options(
-            Validation_Types.only_digits, 1, 1)
+            ValidationTypes.only_digits, 1, 1)
 
     def run(self):
         if self._selected_locale_code is None:
