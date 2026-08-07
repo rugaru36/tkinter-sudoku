@@ -1,6 +1,6 @@
 import json
 import os
-from typing import Final
+from typing import Final, cast
 from lib.file_system import ensure_file, read_file, write_file
 
 
@@ -39,8 +39,8 @@ class Config_Manager:
 
     def _load_config_file(self):
         content = read_file(self._config_file_path)
-        data = json.loads(content)  # pyright: ignore[reportAny]
-        self._config.update_from_dict(data)    # pyright: ignore[reportAny]
+        data = cast(dict[str, str], json.loads(content))
+        self._config.update_from_dict(data)
 
     def _write_config_file(self):
         json_str_content = json.dumps(self._config.__dict__)

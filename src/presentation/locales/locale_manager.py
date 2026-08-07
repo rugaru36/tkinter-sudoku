@@ -60,5 +60,4 @@ class Locale_Manager:
         locale_file_name = f"locale.{self._selected_locale_info["code"]}.json"
         locale_file_path = f"{self._locales_dir_path}/{locale_file_name}"
         file_content = read_file(locale_file_path)
-        self._selected_locale = json.loads(file_content)
-        pass
+        self._selected_locale = cast(dict[str, str], json.loads(file_content))
