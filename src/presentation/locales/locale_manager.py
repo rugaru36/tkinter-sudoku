@@ -38,7 +38,8 @@ class LocaleManager:
     def get_value(self, key: str):
         if key in self._selected_locale:
             return self._selected_locale[key]
-        print(f"locale text value is not found by key {key}")
+        if self._selected_locale_info is not None:
+            print(f"locale text value is not found by key {key}")
         return key
 
     def _load_locale_info_list(self):
