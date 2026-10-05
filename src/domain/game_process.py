@@ -1,5 +1,5 @@
 from typing import Callable, Final
-from domain.difficulty import Difficulty
+from domain.ports.difficulty import Difficulty
 from domain.game_num_matrix import GameNumMatrix
 from domain.unknown_elements import UnknownElementsStorage
 from lib.timer import Timer

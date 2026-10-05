@@ -1,6 +1,6 @@
 from typing import Callable
 
-from domain.difficulty import Difficulty
+from domain.ports.difficulty import Difficulty
 from presentation.screens.common.select_option_screen import Option, SelectOptionScreen
 
 
