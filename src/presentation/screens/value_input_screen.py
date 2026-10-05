@@ -1,4 +1,4 @@
-from tkinter import EW, Button, Entry, Label, Tk
+from tkinter import EW, Button, Entry, Event, Label, Tk
 from typing import Callable, Final
 from tkinter.messagebox import showwarning
 
@@ -77,6 +77,8 @@ class ValueInputScreen:
         entry.focus()
         entry.grid(row=1, column=0, columnspan=5, ipadx=50,
                    ipady=6, padx=4, pady=4, sticky=EW)
+                   
+        _ = window.bind("<Return>", self._on_confirm)
 
         ok_btn_msg = self._get_text("on_confirm")
         ok_btn = Button(window, text=ok_btn_msg, command=self._on_confirm)
@@ -87,8 +89,8 @@ class ValueInputScreen:
         self._message_label = message_label
 
         window.grab_set()
-
-    def _on_confirm(self):
+    
+    def _on_confirm(self, _event: Event | None = None):
         if self._is_valid_value and self._root_widget:
             self._destroy_root_widget()
             if self._cb_on_confirm is not None:

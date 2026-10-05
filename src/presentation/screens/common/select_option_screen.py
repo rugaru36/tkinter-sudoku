@@ -1,6 +1,6 @@
 
 from typing import Final, Generic, TypeVar, Callable
-from tkinter import NSEW, Button, Tk
+from tkinter import NSEW, Button, Event, Tk
 
 
 OptionType = TypeVar('OptionType', str, bool, int)
