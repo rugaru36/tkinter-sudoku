@@ -77,7 +77,7 @@ class GameProcess:
         return self._filling_state.check_is_actually_unknown(row, col)
 
     def _parse_difficulty(self):
-        difficulty_data = Difficulty.get_dif_data(self._difficulty_name)
+        difficulty_data = Difficulty.get_dif_data_by_name(self._difficulty_name)
         self._mistakes_left = int(difficulty_data["count_of_mistakes"])
         self._init_unknown_elements_count = int(
             difficulty_data["count_of_unknown_elements"])

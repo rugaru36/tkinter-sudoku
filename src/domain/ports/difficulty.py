@@ -7,7 +7,7 @@ class Difficulty:
     hard: Final = "Hard"
 
     @staticmethod
-    def get_dif_data(name: str) -> dict[str, str | int]:
+    def get_dif_data_by_name(name: str) -> dict[str, str | int]:
         match name:
             case Difficulty.easy:
                 return {
@@ -29,4 +29,25 @@ class Difficulty:
                     "count_of_unknown_elements": 40,
                     "count_of_mistakes": 4
                 }
-            case _: return Difficulty.get_dif_data(Difficulty.mid)
+            case _: return Difficulty.get_dif_data_by_name(Difficulty.mid)
+
+    @staticmethod
+    def get_all():
+        return [{
+                "name": Difficulty.easy,
+                "time_seconds": 15 * 60,
+                "count_of_unknown_elements": 20,
+                "count_of_mistakes": 10},
+            {
+                "name": Difficulty.mid,
+                "time_seconds": 10 * 60,
+                "count_of_unknown_elements": 30,
+                "count_of_mistakes": 7
+            },
+            {
+                "name": Difficulty.hard,
+                "time_seconds": 5 * 60,
+                "count_of_unknown_elements": 40,
+                "count_of_mistakes": 4
+            }
+        ]

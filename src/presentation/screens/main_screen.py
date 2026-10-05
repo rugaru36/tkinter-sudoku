@@ -118,12 +118,10 @@ class MainScreen:
             main_menu = Menu()
 
             diff_menu = Menu(tearoff=0)
-            diff_menu.add_command(
-                label=self._get_top_bar_difficulty_label(Difficulty.easy), command=lambda: self._on_change_difficulty(Difficulty.easy))
-            diff_menu.add_command(
-                label=self._get_top_bar_difficulty_label(Difficulty.mid), command=lambda: self._on_change_difficulty(Difficulty.mid))
-            diff_menu.add_command(
-                label=self._get_top_bar_difficulty_label(Difficulty.hard), command=lambda: self._on_change_difficulty(Difficulty.hard))
+            for diff_info in Difficulty.get_all():
+                diff_name_from_info = str(diff_info["name"])
+                diff_menu.add_command(
+                    label=self._get_top_bar_difficulty_label(diff_name_from_info), command=lambda name=diff_name_from_info: self._on_change_difficulty(str(name)))
 
             locale_menu = Menu(tearoff=0)
             for locale_info in self._locale_info_list:
