@@ -3,9 +3,9 @@ from tkinter import NS, W, Button, Frame, Label, Menu, TclError, Tk
 from tkinter.messagebox import askyesno, showinfo
 from typing import Callable, Final
 from config.config_manager import ConfigManager
-from domain.difficulty import Difficulty
+from domain.ports.difficulty import Difficulty
 from domain.game_process import GameProcess
-from domain.game_status import GameStatus
+from domain.ports.game_status import GameStatus
 from presentation.locales.locale_manager import LocaleInfo
 
 
@@ -67,8 +67,10 @@ class MainScreen:
             self._game_process.start(difficulty)
         self._show()
 
-    def reset_ui(self):
+    def reset_ui(self, with_game_field_reload: bool):
         difficulty_level = self._config_manager.get_difficulty_level()
+        if with_game_field_reload: self._game_process = GameProcess(self._update_status)
+
         if difficulty_level is not None:
             self.run_ui(difficulty_level)
         elif self._root_widget is not None:
@@ -117,19 +119,16 @@ class MainScreen:
 
             diff_menu = Menu(tearoff=0)
             diff_menu.add_command(
-                label="Easy", command=lambda: self._on_change_difficulty(Difficulty.easy))
+                label=self._get_top_bar_difficulty_label(Difficulty.easy), command=lambda: self._on_change_difficulty(Difficulty.easy))
             diff_menu.add_command(
-                label="Mid", command=lambda: self._on_change_difficulty(Difficulty.mid))
+                label=self._get_top_bar_difficulty_label(Difficulty.mid), command=lambda: self._on_change_difficulty(Difficulty.mid))
             diff_menu.add_command(
-                label="Hard", command=lambda: self._on_change_difficulty(Difficulty.hard))
+                label=self._get_top_bar_difficulty_label(Difficulty.hard), command=lambda: self._on_change_difficulty(Difficulty.hard))
 
             locale_menu = Menu(tearoff=0)
             for locale_info in self._locale_info_list:
-                label = locale_info["name"]
-                if locale_info["is_selected"]:
-                    label = "> " + label
                 locale_menu.add_command(
-                    label=label, command=lambda code=locale_info["code"]: self._on_change_locale(code))
+                    label=self._get_top_bar_locale_label(locale_info), command=lambda code=locale_info["code"]: self._on_change_locale(code))
 
             main_menu.add_cascade(label=self._cb_get_text(
                 "main_screen.top_menu.difficulty"), menu=diff_menu)
@@ -240,3 +239,14 @@ class MainScreen:
         self._selected_col = None
         self._is_in_progress = True
         self._status_label = None
+
+    def _get_top_bar_difficulty_label(self, difficulty: str):
+        if self._difficulty == difficulty:
+            return "> " + difficulty
+        return difficulty
+
+    def _get_top_bar_locale_label(self, locale_info: LocaleInfo):
+        label = locale_info["name"]
+        if locale_info["is_selected"]:
+            label = "> " + label
+        return label

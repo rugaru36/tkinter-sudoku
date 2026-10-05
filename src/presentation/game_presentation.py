@@ -10,7 +10,7 @@ from presentation.screens.value_input_screen import ValidationTypes, ValueInputS
 
 
 class GamePresentation:
-    def __init__(self) -> None:
+    def __init__(self, with_storable_config: bool = True) -> None:
         self._locale_manager: Final = LocaleManager()
         locale_info_list = self._locale_manager.get_locale_info_list()
 
@@ -68,13 +68,13 @@ class GamePresentation:
         if locale_code == self._selected_locale_code:
             return
         self._set_locale_value(locale_code)
-        self._main_screen.reset_ui()
+        self._main_screen.reset_ui(False)
 
     def _on_change_difficulty_from_menu_bar(self, difficulty: str):
         if difficulty == self._selected_difficulty_level:
             return
         self._set_difficulty_value(difficulty)
-        self._main_screen.reset_ui()
+        self._main_screen.reset_ui(True)
 
     def _show_startup_locale_selector(self):
         locale_code = self._select_locale_screen.run()
