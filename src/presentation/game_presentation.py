@@ -27,8 +27,8 @@ class GamePresentation:
             self._on_element_select,
             self._on_reload,
             self._locale_manager.get_value,
-            self._on_change_locale_from_top_menu,
-            self._on_change_difficulty_from_top_menu
+            self._on_change_locale_from_menu_bar,
+            self._on_change_difficulty_from_menu_bar
         )
 
         self._selected_difficulty_level: str | None = self._config_manager.get_difficulty_level()
@@ -64,13 +64,13 @@ class GamePresentation:
 
     # handle UI events
 
-    def _on_change_locale_from_top_menu(self, locale_code: str):
+    def _on_change_locale_from_menu_bar(self, locale_code: str):
         if locale_code == self._selected_locale_code:
             return
         self._set_locale_value(locale_code)
         self._main_screen.reset_ui()
 
-    def _on_change_difficulty_from_top_menu(self, difficulty: str):
+    def _on_change_difficulty_from_menu_bar(self, difficulty: str):
         if difficulty == self._selected_difficulty_level:
             return
         self._set_difficulty_value(difficulty)
