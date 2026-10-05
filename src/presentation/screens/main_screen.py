@@ -62,7 +62,9 @@ class MainScreen:
             self._reload_values_to_default()
         else:
             self._game_process = GameProcess(self._update_status)
-        self._game_process.start(difficulty)
+        
+        if not (self._difficulty == difficulty and self._game_process.get_is_in_progress()):
+            self._game_process.start(difficulty)
         self._show()
 
     def reset_ui(self):
