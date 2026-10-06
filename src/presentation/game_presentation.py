@@ -10,7 +10,7 @@ from presentation.screens.value_input_screen import ValidationTypes, ValueInputS
 
 
 class GamePresentation:
-    def __init__(self, with_storable_config: bool = True) -> None:
+    def __init__(self) -> None:
         self._locale_manager: Final = LocaleManager()
         locale_info_list = self._locale_manager.get_locale_info_list()
 

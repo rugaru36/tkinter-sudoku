@@ -14,10 +14,10 @@ class ConfigData:
 
 
 class ConfigManager:
-    def __init__(self, to_store = True) -> None:
+    def __init__(self) -> None:
         config_file_name = "config.json"
         self._config_file_path: Final = f"{os.getcwd()}/{config_file_name}"
-        self._storable_config: Final = to_store
+        self._storable_config: Final = True
         self._config: Final = ConfigData()
 
         if self._storable_config:
@@ -39,20 +39,20 @@ class ConfigManager:
         self._write_config_file()
 
     def _init_config_file(self):
-        if not self._storable_config: 
+        if not self._storable_config:
             return
         ensure_file(self._config_file_path, "{}")
         self._load_config_file()
 
     def _load_config_file(self):
-        if not self._storable_config: 
+        if not self._storable_config:
             return
         content = read_file(self._config_file_path)
         data = cast(dict[str, str], json.loads(content))
         self._config.update_from_dict(data)
 
     def _write_config_file(self):
-        if not self._storable_config: 
+        if not self._storable_config:
             return
         json_str_content = json.dumps(self._config.__dict__)
         write_file(self._config_file_path, json_str_content)
