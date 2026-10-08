@@ -79,6 +79,8 @@ class ValueInputScreen:
                    ipady=6, padx=4, pady=4, sticky=EW)
                    
         _ = window.bind("<Return>", self._on_confirm)
+        _ = window.bind("<KP_Enter>", self._on_confirm)
+        _ = window.bind("<Escape>", self._destroy_root_widget)
 
         ok_btn_msg = self._get_text("on_confirm")
         ok_btn = Button(window, text=ok_btn_msg, command=self._on_confirm)
@@ -89,7 +91,7 @@ class ValueInputScreen:
         self._message_label = message_label
 
         window.grab_set()
-    
+
     def _on_confirm(self, _event: Event | None = None):
         if self._is_valid_value and self._root_widget:
             self._destroy_root_widget()
@@ -100,7 +102,7 @@ class ValueInputScreen:
             msg = self._get_text("invalid_value_msg")
             _ = showwarning(title, msg)
 
-    def _destroy_root_widget(self):
+    def _destroy_root_widget(self, _event: Event | None = None):
         if self._root_widget is None:
             return
         self._root_widget.grab_release()

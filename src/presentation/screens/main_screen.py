@@ -92,7 +92,7 @@ class MainScreen:
         if self._cb_on_element_selected is not None:
             self._cb_on_element_selected()
 
-    def _on_reload(self):
+    def _reload(self):
         self._on_destroy()
         if self._root_widget is not None:
             self._root_widget = None
@@ -139,7 +139,7 @@ class MainScreen:
         frame.grid(row=0, column=0, columnspan=3, sticky=W)
 
         reload_btn = Button(frame, text=self._cb_get_text(
-            "main_screen.reload"), command=self._on_reload)
+            "main_screen.reload"), command=self._reload)
         reload_btn.grid(row=0, column=0, rowspan=1, ipady=15)
 
         status_label = Label(frame, text="", justify="left")
