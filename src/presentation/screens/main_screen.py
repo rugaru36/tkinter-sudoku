@@ -58,7 +58,7 @@ class MainScreen:
     def get_is_in_progress(self):
         return self._is_in_progress
 
-    def run_ui(self, difficulty: str):
+    def run(self, difficulty: str):
         self._difficulty = difficulty
         if self._game_process:
             self._reload_values_to_default()
@@ -69,19 +69,19 @@ class MainScreen:
             self._game_process.start(difficulty)
         self._show()
 
-    def reset_ui(self, with_game_field_reload: bool):
+    def reload(self, with_game_field_reload: bool):
         difficulty_level = self._config_manager.get_difficulty_level()
         if with_game_field_reload:
             self._game_process = GameProcess(self._update_status)
 
         if difficulty_level is not None:
-            self.run_ui(difficulty_level)
+            self.run(difficulty_level)
         elif self._root_widget is not None:
             self._root_widget.destroy()
             self._root_widget = None
             self._show()
         elif self._difficulty is not None:
-            self.run_ui(self._difficulty)
+            self.run(self._difficulty)
         return
 
     def _on_element_select(self, row: int, col: int):

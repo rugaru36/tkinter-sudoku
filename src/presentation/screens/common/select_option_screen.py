@@ -21,6 +21,8 @@ class SelectOptionScreen(Generic[OptionType]):
         self._options: Final = options
         self._get_text_cb: Final = get_text_cb
         self._title_name: Final = title_name
+        self._buttons: list[Button] = []
+        self._focus_index: int = -1
 
     def run(self) -> OptionType | None:
         self._value = None
@@ -40,6 +42,7 @@ class SelectOptionScreen(Generic[OptionType]):
             btn.grid(row=row, column=0, columnspan=10, ipadx=100,
                      ipady=6, padx=4, pady=4, sticky=NSEW)
             row = row + 1
+            self._buttons.append(btn)
 
         _ = window.bind("<Key>", self._key_handler)
 
@@ -47,19 +50,37 @@ class SelectOptionScreen(Generic[OptionType]):
         window.mainloop()
 
     def _key_handler(self, event: Event):
-        input_key = safe_str_to_int(event.char)
-        print(len(self._options), input_key)
-        if input_key is None:
-            print("Not a number!")
-            return
-        elif input_key > len(self._options):
+        print(event.char, event.keysym, event.keycode)
+        arrow_keysyms = ["Down", "Up"]
+        arrow_select_keysyms = ["Return", "KP_Enter"]
+
+        input_num = safe_str_to_int(event.char)
+        if input_num is not None:
+            self._handle_num_key(input_num)
+        elif event.keysym in arrow_keysyms:
+            self._handle_arrow_key(event.keysym)
+        elif event.keysym in arrow_select_keysyms:
+            self._on_select(self._options[self._focus_index].value)
+
+    def _handle_num_key(self, input_num: int):
+        if input_num > len(self._options):
             print("Too big num!")
             return
-
-        index = input_key - 1
+        index = input_num - 1
         selected_option = self._options[index]
         print(selected_option.name)
         self._on_select(selected_option.value)
+
+    def _handle_arrow_key(self, keysym: str):
+        new_focus_index = self._focus_index
+        if keysym == "Down":
+            new_focus_index = self._focus_index + 1
+        elif keysym == "Up":
+            new_focus_index = self._focus_index - 1
+        if new_focus_index > len(self._options) or new_focus_index < 0:
+            return
+        self._buttons[new_focus_index].focus()
+        self._focus_index = new_focus_index
 
     def _on_select(self, new_value: OptionType):
         self._value = new_value

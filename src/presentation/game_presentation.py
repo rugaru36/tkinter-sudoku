@@ -48,7 +48,7 @@ class GamePresentation:
             self._show_startup_difficulty_selector()
         if self._selected_difficulty_level is None:
             raise ValueError("_difficulty_level is None")
-        self._main_screen.run_ui(self._selected_difficulty_level)
+        self._main_screen.run(self._selected_difficulty_level)
 
     def _on_reload(self):
         self.run()
@@ -68,13 +68,13 @@ class GamePresentation:
         if locale_code == self._selected_locale_code:
             return
         self._set_locale_value(locale_code)
-        self._main_screen.reset_ui(False)
+        self._main_screen.reload(False)
 
     def _on_change_difficulty_from_menu_bar(self, difficulty: str):
         if difficulty == self._selected_difficulty_level:
             return
         self._set_difficulty_value(difficulty)
-        self._main_screen.reset_ui(True)
+        self._main_screen.reload(True)
 
     def _show_startup_locale_selector(self):
         locale_code = self._select_locale_screen.run()
