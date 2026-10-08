@@ -20,11 +20,13 @@ class MainScreen:
                  cb_change_locale: Callable[[str], None],
                  cb_change_difficulty: Callable[[str], None]
                  ) -> None:
-        self._cb_on_element_selected: Callable[[], None] = cb_on_element_selected
+        self._cb_on_element_selected: Callable[[
+        ], None] = cb_on_element_selected
         self._cb_on_reload: Callable[[], None] = cb_on_reload
         self._cb_get_text: Callable[[str], str] = cb_get_text
         self._cb_change_locale: Callable[[str], None] = cb_change_locale
-        self._cb_change_difficulty: Callable[[str], None] = cb_change_difficulty
+        self._cb_change_difficulty: Callable[[
+            str], None] = cb_change_difficulty
 
         self._difficulty: str | None = None
         self._config_manager: ConfigManager = config_manager
@@ -62,14 +64,15 @@ class MainScreen:
             self._reload_values_to_default()
         else:
             self._game_process = GameProcess(self._update_status)
-        
+
         if not (self._difficulty == difficulty and self._game_process.get_is_in_progress()):
             self._game_process.start(difficulty)
         self._show()
 
     def reset_ui(self, with_game_field_reload: bool):
         difficulty_level = self._config_manager.get_difficulty_level()
-        if with_game_field_reload: self._game_process = GameProcess(self._update_status)
+        if with_game_field_reload:
+            self._game_process = GameProcess(self._update_status)
 
         if difficulty_level is not None:
             self.run_ui(difficulty_level)
@@ -239,9 +242,10 @@ class MainScreen:
         self._status_label = None
 
     def _get_top_bar_difficulty_label(self, difficulty: str):
+        localized_diff = self._cb_get_text(f"select_diff.{difficulty}")
         if self._difficulty == difficulty:
-            return "> " + difficulty
-        return difficulty
+            return "> " + localized_diff
+        return localized_diff
 
     def _get_top_bar_locale_label(self, locale_info: LocaleInfo):
         label = locale_info["name"]

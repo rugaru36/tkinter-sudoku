@@ -2,9 +2,9 @@ from typing import Final
 
 
 class Difficulty:
-    easy: Final = "Easy"
-    mid: Final = "Medium"
-    hard: Final = "Hard"
+    easy: Final = "easy"
+    mid: Final = "mid"
+    hard: Final = "hard"
 
     @staticmethod
     def get_dif_data_by_name(name: str) -> dict[str, str | int]:
