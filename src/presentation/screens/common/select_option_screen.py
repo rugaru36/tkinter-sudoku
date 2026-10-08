@@ -2,6 +2,8 @@
 from typing import Final, Generic, TypeVar, Callable
 from tkinter import NSEW, Button, Event, Tk
 
+from lib.string import safe_str_to_int
+
 
 OptionType = TypeVar('OptionType', str, bool, int)
 
@@ -33,14 +35,31 @@ class SelectOptionScreen(Generic[OptionType]):
 
         row = 0
         for option in self._options:
-            btn = Button(text=self._get_text_cb(option.name),
+            btn = Button(text=f"{row + 1}. " + self._get_text_cb(option.name),
                          command=lambda value=option.value: self._on_select(value))
             btn.grid(row=row, column=0, columnspan=10, ipadx=100,
                      ipady=6, padx=4, pady=4, sticky=NSEW)
             row = row + 1
 
+        _ = window.bind("<Key>", self._key_handler)
+
         self._root_widget = window
         window.mainloop()
+
+    def _key_handler(self, event: Event):
+        input_key = safe_str_to_int(event.char)
+        print(len(self._options), input_key)
+        if input_key is None:
+            print("Not a number!")
+            return
+        elif input_key > len(self._options):
+            print("Too big num!")
+            return
+
+        index = input_key - 1
+        selected_option = self._options[index]
+        print(selected_option.name)
+        self._on_select(selected_option.value)
 
     def _on_select(self, new_value: OptionType):
         self._value = new_value
