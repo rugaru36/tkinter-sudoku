@@ -77,7 +77,7 @@ class SelectOptionScreen(Generic[OptionType]):
             new_focus_index = self._focus_index + 1
         elif keysym == "Up":
             new_focus_index = self._focus_index - 1
-        if new_focus_index > len(self._options) or new_focus_index < 0:
+        if new_focus_index > (len(self._options) - 1) or new_focus_index < 0:
             return
         self._buttons[new_focus_index].focus()
         self._focus_index = new_focus_index
