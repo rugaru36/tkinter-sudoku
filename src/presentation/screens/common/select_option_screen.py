@@ -45,7 +45,7 @@ class SelectOptionScreen(Generic[OptionType]):
             self._buttons.append(btn)
 
         _ = window.bind("<Key>", self._key_handler)
-
+        self._buttons[0].focus()
         self._root_widget = window
         window.mainloop()
 
