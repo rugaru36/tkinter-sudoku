@@ -80,8 +80,8 @@ class MainScreen:
 
         elif self._root_widget is not None:
             self._drop_screen_data()
-            self._root_widget = None
             self._show()
+
         
     def _on_element_select(self, row: int, col: int):
         if self._game_process is None:
@@ -225,8 +225,6 @@ class MainScreen:
         if self._root_widget:
             self._root_widget.destroy()
             self._root_widget = None
-        if self._game_process is not None:
-            self._game_process.stop_timer()
         self._num_buttons = []
         self._selected_row = None
         self._selected_col = None
