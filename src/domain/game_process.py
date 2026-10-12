@@ -22,7 +22,7 @@ class GameProcess:
 
         self._is_in_progress: bool = False
 
-    def start(self, difficulty_name: str):
+    def start_new_process(self, difficulty_name: str):
         self._difficulty_name = difficulty_name
         self._parse_difficulty()
         self._is_in_progress = True
@@ -30,7 +30,17 @@ class GameProcess:
         self._game_num_matrix.generate()
         self._timer.start()
 
-    def stop(self):
+    def restart_process(self):
+        if not self._is_in_progress and not self._difficulty_name:
+            print("Can`t resume game process because no process running found")
+        self.start_new_process(self._difficulty_name)
+
+    def resume_process(self):
+        if not self._is_in_progress and not self._difficulty_name:
+            print("Can`t resume game process because no process running found")
+        self._timer.start()
+
+    def stop_timer(self):
         self._timer.stop()
 
     def on_new_value(self, value: int, row: int, col: int) -> bool:
@@ -54,6 +64,9 @@ class GameProcess:
 
     def get_is_in_progress(self):
         return self._is_in_progress
+
+    def get_curr_difficulty(self):
+        return self._difficulty_name
 
     def get_time_left(self):
         return self._left_seconds_time

@@ -1,6 +1,6 @@
 from math import sqrt
 from tkinter import NS, W, Button, Frame, Label, Menu, TclError, Tk
-from tkinter.messagebox import askyesno, showinfo
+from tkinter.messagebox import showinfo
 from typing import Callable, Final
 from config.config_manager import ConfigManager
 from domain.ports.difficulty import Difficulty
@@ -28,7 +28,6 @@ class MainScreen:
         self._cb_on_change_difficulty: Callable[[
             str], None] = cb_change_difficulty
 
-        self._difficulty: str | None = None
         self._config_manager: ConfigManager = config_manager
         self._locale_info_list: Final = locale_info_list
 
@@ -59,31 +58,31 @@ class MainScreen:
         return self._is_in_progress
 
     def run(self, difficulty: str):
-        self._difficulty = difficulty
         if self._game_process:
-            self._reload_screen_to_default()
+            self._drop_screen_data()
+            self._game_process.restart_process()
         else:
             self._game_process = GameProcess(self._update_status)
 
-        if not (self._difficulty == difficulty and self._game_process.get_is_in_progress()):
-            self._game_process.start(difficulty)
+        need_to_restart_process = self._game_process.get_curr_difficulty != difficulty and self._game_process.get_is_in_progress()
+        need_to_start_process = not self._game_process.get_is_in_progress()
+        if need_to_restart_process or need_to_start_process:
+            self._game_process.start_new_process(difficulty)
         self._show()
 
-    def reload(self, with_game_field_reload: bool = True):
+    def restart(self, with_game_process_reload: bool = True):
         difficulty_level = self._config_manager.get_difficulty_level()
-        if with_game_field_reload:
-            self._game_process = GameProcess(self._update_status)
+        if with_game_process_reload and self._game_process and difficulty_level:
+            self._game_process.start_new_process(difficulty_level)
         
-
-        if difficulty_level is not None:
+        if not self._game_process and difficulty_level:
             self.run(difficulty_level)
+
         elif self._root_widget is not None:
-            self._reload_screen_to_default()
+            self._drop_screen_data()
             self._root_widget = None
             self._show()
-        elif self._difficulty is not None:
-            self.run(self._difficulty)
-
+        
     def _on_element_select(self, row: int, col: int):
         if self._game_process is None:
             return
@@ -94,15 +93,6 @@ class MainScreen:
         self._selected_col = col
         if self._cb_on_element_selected is not None:
             self._cb_on_element_selected()
-
-    # def _reload(self):
-    #     if self._difficulty is None:
-    #         print("self._difficulty is None: can`t reload screen")
-    #         return
-    #     self._on_destroy()
-    #     if self._root_widget is not None:
-    #         self._root_widget = None
-    #     self.reload(True)
 
     def _show(self):
         window = Tk()
@@ -145,7 +135,7 @@ class MainScreen:
         frame.grid(row=0, column=0, columnspan=3, sticky=W)
 
         reload_btn = Button(frame, text=self._cb_get_text(
-            "main_screen.reload"), command=self.reload)
+            "main_screen.reload"), command=self.restart)
         reload_btn.grid(row=0, column=0, rowspan=1, ipady=15)
 
         status_label = Label(frame, text="", justify="left")
@@ -211,32 +201,32 @@ class MainScreen:
 
     def _on_destroy(self):
         if self._game_process is not None:
-            self._game_process.stop()
+            self._game_process.stop_timer()
         if self._root_widget is not None:
             self._root_widget.destroy()
 
     def _on_change_difficulty(self, new_value: str):
-        if new_value == self._difficulty:
+        if not self._game_process:
+            print("no game process")
+            return
+        if new_value == self._game_process.get_curr_difficulty():
             _ = showinfo("same diff", "da same diff bro")
             return
-        is_change_confirmed = askyesno("u sure?", "ar u sure bout dis?")
-        if is_change_confirmed:
-            self._reload_screen_to_default()
-            self._cb_on_change_difficulty(new_value)
-        self.reload()
+        self._cb_on_change_difficulty(new_value)
+        self.restart(True)
 
     def _on_change_locale(self, new_value: str):
         if new_value == self._config_manager.get_locale():
             return
         self._cb_on_change_locale(new_value)
-        self.reload(False)
+        self.restart(False)
 
-    def _reload_screen_to_default(self):
+    def _drop_screen_data(self):
         if self._root_widget:
             self._root_widget.destroy()
             self._root_widget = None
         if self._game_process is not None:
-            self._game_process.stop()
+            self._game_process.stop_timer()
         self._num_buttons = []
         self._selected_row = None
         self._selected_col = None
@@ -245,7 +235,7 @@ class MainScreen:
 
     def _get_top_bar_difficulty_label(self, difficulty: str):
         localized_diff = self._cb_get_text(f"select_diff.{difficulty}")
-        if self._difficulty == difficulty:
+        if self._config_manager.get_difficulty_level() == difficulty:
             return "> " + localized_diff
         return localized_diff
 
