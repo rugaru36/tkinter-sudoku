@@ -24,8 +24,8 @@ class MainScreen:
         ], None] = cb_on_element_selected
         self._cb_on_reload: Callable[[], None] = cb_on_reload
         self._cb_get_text: Callable[[str], str] = cb_get_text
-        self._cb_change_locale: Callable[[str], None] = cb_change_locale
-        self._cb_change_difficulty: Callable[[
+        self._cb_on_change_locale: Callable[[str], None] = cb_change_locale
+        self._cb_on_change_difficulty: Callable[[
             str], None] = cb_change_difficulty
 
         self._difficulty: str | None = None
@@ -61,7 +61,7 @@ class MainScreen:
     def run(self, difficulty: str):
         self._difficulty = difficulty
         if self._game_process:
-            self._reload_values_to_default()
+            self._reload_screen_to_default()
         else:
             self._game_process = GameProcess(self._update_status)
 
@@ -69,20 +69,20 @@ class MainScreen:
             self._game_process.start(difficulty)
         self._show()
 
-    def reload(self, with_game_field_reload: bool):
+    def reload(self, with_game_field_reload: bool = True):
         difficulty_level = self._config_manager.get_difficulty_level()
         if with_game_field_reload:
             self._game_process = GameProcess(self._update_status)
+        
 
         if difficulty_level is not None:
             self.run(difficulty_level)
         elif self._root_widget is not None:
-            self._root_widget.destroy()
+            self._reload_screen_to_default()
             self._root_widget = None
             self._show()
         elif self._difficulty is not None:
             self.run(self._difficulty)
-        return
 
     def _on_element_select(self, row: int, col: int):
         if self._game_process is None:
@@ -95,11 +95,14 @@ class MainScreen:
         if self._cb_on_element_selected is not None:
             self._cb_on_element_selected()
 
-    def _reload(self):
-        self._on_destroy()
-        if self._root_widget is not None:
-            self._root_widget = None
-        self._cb_on_reload()
+    # def _reload(self):
+    #     if self._difficulty is None:
+    #         print("self._difficulty is None: can`t reload screen")
+    #         return
+    #     self._on_destroy()
+    #     if self._root_widget is not None:
+    #         self._root_widget = None
+    #     self.reload(True)
 
     def _show(self):
         window = Tk()
@@ -142,7 +145,7 @@ class MainScreen:
         frame.grid(row=0, column=0, columnspan=3, sticky=W)
 
         reload_btn = Button(frame, text=self._cb_get_text(
-            "main_screen.reload"), command=self._reload)
+            "main_screen.reload"), command=self.reload)
         reload_btn.grid(row=0, column=0, rowspan=1, ipady=15)
 
         status_label = Label(frame, text="", justify="left")
@@ -218,18 +221,17 @@ class MainScreen:
             return
         is_change_confirmed = askyesno("u sure?", "ar u sure bout dis?")
         if is_change_confirmed:
-            self._reload_values_to_default()
-            self._cb_change_difficulty(new_value)
+            self._reload_screen_to_default()
+            self._cb_on_change_difficulty(new_value)
+        self.reload()
 
     def _on_change_locale(self, new_value: str):
-        for locale_info in self._locale_info_list:
-            if locale_info["code"] == new_value and locale_info["is_selected"]:
-                return
-            elif locale_info["code"] == new_value and not locale_info["is_selected"]:
-                break
-        self._cb_change_locale(new_value)
+        if new_value == self._config_manager.get_locale():
+            return
+        self._cb_on_change_locale(new_value)
+        self.reload(False)
 
-    def _reload_values_to_default(self):
+    def _reload_screen_to_default(self):
         if self._root_widget:
             self._root_widget.destroy()
             self._root_widget = None
@@ -249,6 +251,6 @@ class MainScreen:
 
     def _get_top_bar_locale_label(self, locale_info: LocaleInfo):
         label = locale_info["name"]
-        if locale_info["is_selected"]:
+        if locale_info["code"] == self._config_manager.get_locale():
             label = "> " + label
         return label

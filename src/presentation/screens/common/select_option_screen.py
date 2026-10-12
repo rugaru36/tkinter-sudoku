@@ -22,7 +22,7 @@ class SelectOptionScreen(Generic[OptionType]):
         self._get_text_cb: Final = get_text_cb
         self._title_name: Final = title_name
         self._buttons: list[Button] = []
-        self._focus_index: int = -1
+        self._focus_index: int = 0
 
     def run(self) -> OptionType | None:
         self._value = None

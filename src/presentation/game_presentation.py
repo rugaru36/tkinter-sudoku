@@ -11,7 +11,9 @@ from presentation.screens.value_input_screen import ValidationTypes, ValueInputS
 
 class GamePresentation:
     def __init__(self) -> None:
-        self._locale_manager: Final = LocaleManager()
+        self._config_manager: Final = ConfigManager()
+
+        self._locale_manager: Final = LocaleManager(self._config_manager)
         locale_info_list = self._locale_manager.get_locale_info_list()
 
         self._select_locale_screen: Final = LocaleSelectScreen(
@@ -20,7 +22,6 @@ class GamePresentation:
         )
         self._difficulty_select_screen: Final = DifficultySelectScreen(
             self._locale_manager.get_value)
-        self._config_manager: Final = ConfigManager()
         self._main_screen: Final = MainScreen(
             self._config_manager,
             locale_info_list,
@@ -30,9 +31,17 @@ class GamePresentation:
             self._on_change_locale_from_menu_bar,
             self._on_change_difficulty_from_menu_bar
         )
+        self._selected_locale_code: str | None = None
+        self._selected_difficulty_level: str | None = None
 
-        self._selected_difficulty_level: str | None = self._config_manager.get_difficulty_level()
-        self._selected_locale_code: str | None = self._config_manager.get_locale()
+        locale_from_config: str | None = self._config_manager.get_locale()
+        difficulty_from_config: str | None = self._config_manager.get_difficulty_level()
+
+        if locale_from_config is not None:
+            self._set_locale_value(locale_from_config)
+
+        if difficulty_from_config is not None:
+            self._set_difficulty_value(difficulty_from_config)
 
         self._num_value_input_screen: Final = ValueInputScreen(
             self._on_element_value, self._locale_manager.get_value, "input_num_value")
@@ -42,12 +51,14 @@ class GamePresentation:
     def run(self):
         if self._selected_locale_code is None:
             self._show_startup_locale_selector()
-        else:
-            self._locale_manager.set_locale(self._selected_locale_code)
+        self._locale_manager.sync_with_config()
+
         if self._selected_difficulty_level is None:
             self._show_startup_difficulty_selector()
+        
         if self._selected_difficulty_level is None:
             raise ValueError("_difficulty_level is None")
+
         self._main_screen.run(self._selected_difficulty_level)
 
     def _on_reload(self):
@@ -55,8 +66,8 @@ class GamePresentation:
 
     def _set_locale_value(self, locale_code: str):
         self._selected_locale_code = locale_code
-        self._locale_manager.set_locale(self._selected_locale_code)
         self._config_manager.set_locale(self._selected_locale_code)
+        self._locale_manager.sync_with_config()
 
     def _set_difficulty_value(self, difficulty: str):
         self._selected_difficulty_level = difficulty
@@ -68,13 +79,11 @@ class GamePresentation:
         if locale_code == self._selected_locale_code:
             return
         self._set_locale_value(locale_code)
-        self._main_screen.reload(False)
 
     def _on_change_difficulty_from_menu_bar(self, difficulty: str):
         if difficulty == self._selected_difficulty_level:
             return
         self._set_difficulty_value(difficulty)
-        self._main_screen.reload(True)
 
     def _show_startup_locale_selector(self):
         locale_code = self._select_locale_screen.run()
