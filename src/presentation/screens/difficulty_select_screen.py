@@ -5,7 +5,7 @@ from presentation.screens.common.select_option_screen import Option, SelectOptio
 
 
 class DifficultySelectScreen(SelectOptionScreen[str]):
-    def __init__(self, get_text_cb: Callable[[str], str]) -> None:
+    def __init__(self, get_text_cb: Callable[[str], str], on_select_cb: Callable[[str], None]) -> None:
         options: list[Option[str]] = []
 
         for diff_info in Difficulty.get_all():
@@ -13,4 +13,4 @@ class DifficultySelectScreen(SelectOptionScreen[str]):
             options.append(
                 Option[str](f"select_diff.{name}", name))
 
-        super().__init__(get_text_cb, "select_diff.title", options)
+        super().__init__(get_text_cb, on_select_cb, "select_diff.title", options)

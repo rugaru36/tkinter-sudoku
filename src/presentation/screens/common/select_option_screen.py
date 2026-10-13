@@ -1,8 +1,9 @@
 
-from typing import Final, Generic, TypeVar, Callable
-from tkinter import NSEW, Button, Event, Tk
+from typing import Final, Generic, TypeVar, Callable, override
+from tkinter import NSEW, Button, Tk
 
-from lib.string import safe_str_to_int
+from presentation.screens.common.screen_with_keyboard_element_selection import ScreenWithKeyboardElementSelection
+from presentation.screens.common.screen_with_keyboard_handling import ArrowKeysSymLiteral
 
 
 OptionType = TypeVar('OptionType', str, bool, int)
@@ -14,22 +15,24 @@ class Option(Generic[OptionType]):
         self.value: Final = value
 
 
-class SelectOptionScreen(Generic[OptionType]):
-    def __init__(self, get_text_cb: Callable[[str], str], title_name: str, options: list[Option[OptionType]]) -> None:
-        self._root_widget: Tk | None = None
+class SelectOptionScreen(Generic[OptionType], ScreenWithKeyboardElementSelection):
+    def __init__(self, get_text_cb: Callable[[str], str], on_select_cb: Callable[[OptionType], None], title_name: str, options: list[Option[OptionType]]) -> None:
         self._value: OptionType | None = None
         self._options: Final = options
         self._get_text_cb: Final = get_text_cb
+        self._on_select_cb: Final = on_select_cb
         self._title_name: Final = title_name
         self._buttons: list[Button] = []
         self._focus_index: int = 0
+        self._root_widget: Tk | None = None
+        super().__init__([0, len(options)])
 
-    def run(self) -> OptionType | None:
+    def run(self):
         self._value = None
         self._show()
-        return self._value
 
     def _show(self):
+        self._focus_index = 0
         window = Tk()
         window.resizable(False, False)
 
@@ -44,24 +47,13 @@ class SelectOptionScreen(Generic[OptionType]):
             row = row + 1
             self._buttons.append(btn)
 
-        _ = window.bind("<Key>", self._key_handler)
-        self._buttons[0].focus()
+        self._bind_default_key_handler(window)
+        self._buttons[self._focus_index].focus()
         self._root_widget = window
+
         window.mainloop()
 
-    def _key_handler(self, event: Event):
-        print(event.char, event.keysym, event.keycode)
-        arrow_keysyms = ["Down", "Up"]
-        arrow_select_keysyms = ["Return", "KP_Enter"]
-
-        input_num = safe_str_to_int(event.char)
-        if input_num is not None:
-            self._handle_num_key(input_num)
-        elif event.keysym in arrow_keysyms:
-            self._handle_arrow_key(event.keysym)
-        elif event.keysym in arrow_select_keysyms:
-            self._on_select(self._options[self._focus_index].value)
-
+    @override
     def _handle_num_key(self, input_num: int):
         if input_num > len(self._options):
             print("Too big num!")
@@ -71,21 +63,34 @@ class SelectOptionScreen(Generic[OptionType]):
         print(selected_option.name)
         self._on_select(selected_option.value)
 
-    def _handle_arrow_key(self, keysym: str):
+    @override
+    def _handle_arrow_key(self, direction: ArrowKeysSymLiteral):
         new_focus_index = self._focus_index
-        if keysym == "Down":
+        if direction == "Down":
             new_focus_index = self._focus_index + 1
-        elif keysym == "Up":
+        elif direction == "Up":
             new_focus_index = self._focus_index - 1
         if new_focus_index > (len(self._options) - 1) or new_focus_index < 0:
             return
         self._buttons[new_focus_index].focus()
         self._focus_index = new_focus_index
 
+    @override
+    def _handle_enter_key(self):
+        value = self._options[self._focus_index].value
+        self._on_select(value)
+
+    @override
+    def _handle_escape_key(self):
+        if self._root_widget:
+            self._root_widget.focus()
+        self._focus_index = 0
+
     def _on_select(self, new_value: OptionType):
         self._value = new_value
         self._destroy_root_widget()
+        self._on_select_cb(new_value)
 
     def _destroy_root_widget(self):
-        if self._root_widget is not None:
+        if self._root_widget:
             self._root_widget.destroy()
