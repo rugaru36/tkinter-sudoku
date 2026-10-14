@@ -1,5 +1,5 @@
 from typing import Callable, Final
-from domain.ports.difficulty import Difficulty
+from domain.ports.game_rules import DifficultyDataByNames, DifficultyNameEnum
 from domain.game_num_matrix import GameNumMatrix
 from domain.unknown_elements import UnknownElementsStorage
 from lib.timer import Timer
@@ -16,13 +16,13 @@ class GameProcess:
         self._left_seconds_time: int = -1
         self._timer: Final = Timer(1, self._timer_handler, 'game_timer')
 
-        self._difficulty_name: str = Difficulty.mid
+        self._difficulty_name: DifficultyNameEnum = DifficultyNameEnum.Medium
         self._game_num_matrix: Final = GameNumMatrix()
         self._filling_state: Final = UnknownElementsStorage()
 
         self._is_in_progress: bool = False
 
-    def start_new_process(self, difficulty_name: str):
+    def start_new_process(self, difficulty_name: DifficultyNameEnum):
         self._difficulty_name = difficulty_name
         self._parse_difficulty()
         self._is_in_progress = True
@@ -90,7 +90,7 @@ class GameProcess:
         return self._filling_state.check_is_actually_unknown(row, col)
 
     def _parse_difficulty(self):
-        difficulty_data = Difficulty.get_dif_data_by_name(self._difficulty_name)
+        difficulty_data = DifficultyDataByNames[self._difficulty_name]
         self._mistakes_left = int(difficulty_data["count_of_mistakes"])
         self._init_unknown_elements_count = int(
             difficulty_data["count_of_unknown_elements"])

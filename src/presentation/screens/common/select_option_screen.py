@@ -1,13 +1,13 @@
 
+from enum import Enum
 from typing import Final, Generic, TypeVar, Callable, override
 from tkinter import NSEW, Button, Tk
 
 from presentation.screens.common.screen_with_keyboard_element_selection import ScreenWithKeyboardElementSelection
 from presentation.screens.common.screen_with_keyboard_handling import ArrowKeysSymLiteral
 
-
-OptionType = TypeVar('OptionType', str, bool, int)
-
+OptionType = TypeVar('OptionType', bound=str | bool | int | Enum)
+KeyType = TypeVar('KeyType', bound=str | Enum)
 
 class Option(Generic[OptionType]):
     def __init__(self, name: str, value: OptionType) -> None:
@@ -15,7 +15,7 @@ class Option(Generic[OptionType]):
         self.value: Final = value
 
 
-class SelectOptionScreen(Generic[OptionType], ScreenWithKeyboardElementSelection):
+class SelectOptionScreen(ScreenWithKeyboardElementSelection[OptionType]):
     def __init__(self, get_text_cb: Callable[[str], str], on_select_cb: Callable[[OptionType], None], title_name: str, options: list[Option[OptionType]]) -> None:
         self._value: OptionType | None = None
         self._options: Final = options
@@ -23,7 +23,6 @@ class SelectOptionScreen(Generic[OptionType], ScreenWithKeyboardElementSelection
         self._on_select_cb: Final = on_select_cb
         self._title_name: Final = title_name
         self._buttons: list[Button] = []
-        self._focus_index: int = 0
         self._root_widget: Tk | None = None
         super().__init__([0, len(options)])
 
@@ -32,7 +31,6 @@ class SelectOptionScreen(Generic[OptionType], ScreenWithKeyboardElementSelection
         self._show()
 
     def _show(self):
-        self._focus_index = 0
         window = Tk()
         window.resizable(False, False)
 
@@ -48,7 +46,7 @@ class SelectOptionScreen(Generic[OptionType], ScreenWithKeyboardElementSelection
             self._buttons.append(btn)
 
         self._bind_default_key_handler(window)
-        self._buttons[self._focus_index].focus()
+        self._buttons[self._focused_element_index[1]].focus()
         self._root_widget = window
 
         window.mainloop()
@@ -65,27 +63,27 @@ class SelectOptionScreen(Generic[OptionType], ScreenWithKeyboardElementSelection
 
     @override
     def _handle_arrow_key(self, direction: ArrowKeysSymLiteral):
-        new_focus_index = self._focus_index
+        new_focus_index = self._focused_element_index[1]
         if direction == "Down":
-            new_focus_index = self._focus_index + 1
+            new_focus_index = new_focus_index + 1
         elif direction == "Up":
-            new_focus_index = self._focus_index - 1
+            new_focus_index = new_focus_index - 1
         if new_focus_index > (len(self._options) - 1) or new_focus_index < 0:
             return
         self._buttons[new_focus_index].focus()
-        self._focus_index = new_focus_index
+        self._focused_element_index[1] = new_focus_index
 
     @override
-    def _handle_enter_key(self):
-        value = self._options[self._focus_index].value
-        self._on_select(value)
+    def _get_focused_element_value(self) -> OptionType | None:
+        return self._options[self._focused_element_index[1]].value
 
     @override
     def _handle_escape_key(self):
         if self._root_widget:
             self._root_widget.focus()
-        self._focus_index = 0
+        self._focused_element_index[1] = 0
 
+    @override
     def _on_select(self, new_value: OptionType):
         self._value = new_value
         self._destroy_root_widget()

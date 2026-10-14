@@ -1,6 +1,6 @@
 from typing import Callable
 
-from domain.ports.difficulty import Difficulty
+from domain.ports.game_rules import DifficultyDataAsArray
 from presentation.screens.common.select_option_screen import Option, SelectOptionScreen
 
 
@@ -8,9 +8,10 @@ class DifficultySelectScreen(SelectOptionScreen[str]):
     def __init__(self, get_text_cb: Callable[[str], str], on_select_cb: Callable[[str], None]) -> None:
         options: list[Option[str]] = []
 
-        for diff_info in Difficulty.get_all():
-            name = str(diff_info["name"])
+        for diff_info in DifficultyDataAsArray:
+            name = diff_info["name"]
             options.append(
-                Option[str](f"select_diff.{name}", name))
+                Option[str](f"select_diff.{name}", str(name)))
+                
 
         super().__init__(get_text_cb, on_select_cb, "select_diff.title", options)

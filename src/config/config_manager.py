@@ -1,7 +1,9 @@
 import json
 import os
 from typing import Final, cast
+from domain.ports.game_rules import DifficultyNameEnum
 from lib.file_system import ensure_file, read_file, write_file
+from lib.string import safe_str_to_enum
 
 
 class ConfigData:
@@ -24,14 +26,16 @@ class ConfigManager:
             ensure_file(self._config_file_path, "{}")
             self._load_config_file()
 
-    def get_difficulty_level(self) -> str | None:
-        return self._config.difficulty_level
+    def get_difficulty_level(self) -> DifficultyNameEnum | None:
+        diff_lvl_as_str = self._config.difficulty_level
+        if diff_lvl_as_str:
+            return safe_str_to_enum(diff_lvl_as_str, DifficultyNameEnum)
 
     def get_locale(self):
         return self._config.locale
 
-    def set_difficulty_level(self, diff_level: str):
-        self._config.difficulty_level = diff_level
+    def set_difficulty_level(self, diff_level: DifficultyNameEnum):
+        self._config.difficulty_level = diff_level.value
         self._write_config_file()
 
     def set_locale(self, locale_code: str):

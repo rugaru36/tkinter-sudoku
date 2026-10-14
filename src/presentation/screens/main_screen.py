@@ -1,16 +1,16 @@
 from math import sqrt
 from tkinter import NS, W, Button, Frame, Label, Menu, TclError, Tk
-from typing import Callable, Final, Literal, override
+from typing import Callable, Final, override
 from config.config_manager import ConfigManager
-from domain.ports.difficulty import Difficulty
+# from domain.ports.difficulty import DifficultyClass, DifficultyLiteral
 from domain.game_process import GameProcess
-from domain.ports.game_status import GameStatus
+from domain.ports.game_rules import GAME_FIELD_SIZE, DifficultyDataAsArray, DifficultyNameEnum, GameStatus
+from lib.string import safe_str_to_enum
 from presentation.locales.locale_manager import LocaleInfo
 from presentation.screens.common.screen_with_keyboard_element_selection import ScreenWithKeyboardElementSelection
-from presentation.screens.common.screen_with_keyboard_handling import ArrowKeysSymLiteral
 
 
-class MainScreen(ScreenWithKeyboardElementSelection):
+class MainScreen(ScreenWithKeyboardElementSelection[list[int]]):
 
     def __init__(self,
                  config_manager: ConfigManager,
@@ -40,8 +40,8 @@ class MainScreen(ScreenWithKeyboardElementSelection):
         self._is_any_key_focused: bool = False
 
         self._status_label: Label | None = None
-        self._focused_element_index: list[int] = [0, 0]
-        super().__init__([9, 10])
+        default_focus_coordinates = [1, 0]
+        super().__init__([GAME_FIELD_SIZE + 1, GAME_FIELD_SIZE], default_focus_coordinates)
 
     def on_new_value(self, value: int):
         if self._game_process is None:
@@ -59,7 +59,7 @@ class MainScreen(ScreenWithKeyboardElementSelection):
     def get_is_in_progress(self):
         return self._is_in_progress
 
-    def run(self, difficulty: str):
+    def run(self, difficulty: DifficultyNameEnum):
         if self._game_process:
             self._drop_screen_data()
             self._game_process.restart_process()
@@ -109,26 +109,8 @@ class MainScreen(ScreenWithKeyboardElementSelection):
         self._update_status()
         self._draw_top_menu()
         self._bind_default_key_handler(window)
+        self._bind_dummy_for_focus(window)
         window.mainloop()
-
-    def _focus_button_needed_to_focus(self):
-        if self._focused_element_index[0] == -1 and self._reload_button:
-            self._reload_button.focus()
-            return
-        elif self._focused_element_index[0] == -1:
-            return
-        x_index = self._focused_element_index[0]
-        y_index = self._focused_element_index[1]
-        target_button = self._num_buttons[x_index][y_index]
-        if target_button:
-            target_button.focus()
-            self._is_any_key_focused = True
-
-    def _remove_key_focus(self):
-        if self._root_widget:
-            self._root_widget.focus()
-        self._focused_element_index = [0, 0]
-        self._is_any_key_focused = False
 
     def _draw_top_menu(self):
         if not self._root_widget:
@@ -136,7 +118,7 @@ class MainScreen(ScreenWithKeyboardElementSelection):
         main_menu = Menu()
 
         diff_menu = Menu(tearoff=0)
-        for diff_info in Difficulty.get_all():
+        for diff_info in DifficultyDataAsArray:
             diff_name_from_info = str(diff_info["name"])
             diff_menu.add_command(
                 label=self._get_top_bar_difficulty_label(diff_name_from_info), command=lambda name=diff_name_from_info: self._on_change_difficulty(str(name)))
@@ -249,11 +231,12 @@ class MainScreen(ScreenWithKeyboardElementSelection):
         self._selected_col = None
         self._is_in_progress = True
         self._status_label = None
-        self._is_any_key_focused = False
+        self._drop_focused_element()
 
     def _get_top_bar_difficulty_label(self, difficulty: str):
         localized_diff = self._cb_get_text(f"select_diff.{difficulty}")
-        if self._config_manager.get_difficulty_level() == difficulty:
+        casted_diff_lvl = safe_str_to_enum(difficulty, DifficultyNameEnum)
+        if self._config_manager.get_difficulty_level() == casted_diff_lvl:
             return "> " + localized_diff
         return localized_diff
 
@@ -264,53 +247,18 @@ class MainScreen(ScreenWithKeyboardElementSelection):
         return label
 
     @override
-    def _handle_arrow_key(self, direction: ArrowKeysSymLiteral):
-        if not self._game_process:
-            return
-        if not self._is_any_key_focused:
-            self._focus_button_needed_to_focus()
-            return
-
-        field_size = self._game_process.get_num_field_size()
-        hor_or_vert: Literal["horizontal", "vertical"] | None = None
-        new_index: None | int = None
-
-        if direction == "Down":
-            new_index = self._focused_element_index[0] + 1
-            hor_or_vert = "vertical"
-        elif direction == "Up":
-            new_index = self._focused_element_index[0] - 1
-            hor_or_vert = "vertical"
-        elif direction == "Right":
-            new_index = self._focused_element_index[1] + 1
-            hor_or_vert = "horizontal"
-        elif direction == "Left":
-            new_index = self._focused_element_index[1] - 1
-            hor_or_vert = "horizontal"
-
-        if hor_or_vert == "horizontal" and new_index == field_size:
-            new_index = 0
-        elif hor_or_vert == "vertical" and new_index == field_size:
-            new_index = -1
-        elif hor_or_vert == "horizontal" and new_index == -1:
-            new_index = field_size - 1
-        elif hor_or_vert == "vertical" and new_index == -2:
-            new_index = field_size - 1
-
-        if hor_or_vert == "horizontal" and self._focused_element_index[1] == -1:
-            return
-        if hor_or_vert == "horizontal" and new_index < field_size and new_index >= 0:
-            self._focused_element_index[1] = new_index
-        elif hor_or_vert == "vertical" and new_index < field_size and new_index >= -1:
-            self._focused_element_index[0] = new_index
-        self._focus_button_needed_to_focus()
+    def _get_focused_element_value(self):
+        return self._focused_element_index
 
     @override
-    def _handle_enter_key(self):
-        x_index = self._focused_element_index[0]
-        y_index = self._focused_element_index[1]
-        self._on_element_select(x_index, y_index)
-
+    def _check_coordinates_exist(self, row: int, col: int) -> bool:
+        return not (row == 0 and col != self._focused_element_index[1])
+    
     @override
-    def _handle_escape_key(self):
-        self._remove_key_focus()
+    def _get_element_needed_to_focus(self):
+        if self._focused_element_index[0] == 0 and self._reload_button:
+            return self._reload_button
+        row = self._focused_element_index[0]
+        col = self._focused_element_index[1]
+        target_button = self._num_buttons[row - 1][col]
+        return target_button

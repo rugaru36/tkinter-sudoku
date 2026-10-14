@@ -2,6 +2,8 @@ import sys
 from typing import Final
 
 from config.config_manager import ConfigManager
+from domain.ports.game_rules import DifficultyNameEnum
+from lib.string import safe_str_to_enum
 from presentation.locales.locale_manager import LocaleManager
 from presentation.screens.difficulty_select_screen import DifficultySelectScreen
 from presentation.screens.locale_select_screen import LocaleSelectScreen
@@ -33,10 +35,10 @@ class GamePresentation:
             self._on_change_difficulty_from_menu_bar
         )
         self._selected_locale_code: str | None = None
-        self._selected_difficulty_level: str | None = None
+        self._selected_difficulty_level: DifficultyNameEnum | None = None
 
-        locale_from_config: str | None = self._config_manager.get_locale()
-        difficulty_from_config: str | None = self._config_manager.get_difficulty_level()
+        locale_from_config = self._config_manager.get_locale()
+        difficulty_from_config = self._config_manager.get_difficulty_level()
 
         if locale_from_config is not None:
             self._set_locale_value(locale_from_config)
@@ -66,15 +68,18 @@ class GamePresentation:
             self._main_screen.run(self._selected_difficulty_level)
 
     def _on_difficulty_selected(self, difficulty: str):
-        self._set_difficulty_value(difficulty)
-        self._main_screen.run(difficulty)
+        casted_diff_lvl = safe_str_to_enum(difficulty, DifficultyNameEnum)
+        if not casted_diff_lvl:
+            return
+        self._set_difficulty_value(casted_diff_lvl)
+        self._main_screen.run(casted_diff_lvl)
 
     def _set_locale_value(self, locale_code: str):
         self._selected_locale_code = locale_code
         self._config_manager.set_locale(self._selected_locale_code)
         self._locale_manager.sync_with_config()
 
-    def _set_difficulty_value(self, difficulty: str):
+    def _set_difficulty_value(self, difficulty: DifficultyNameEnum):
         self._selected_difficulty_level = difficulty
         self._config_manager.set_difficulty_level(diff_level=difficulty)
 
@@ -88,7 +93,9 @@ class GamePresentation:
     def _on_change_difficulty_from_menu_bar(self, difficulty: str):
         if difficulty == self._selected_difficulty_level:
             return
-        self._set_difficulty_value(difficulty)
+        casted_diff_name = safe_str_to_enum(difficulty, DifficultyNameEnum)
+        if casted_diff_name:
+            self._set_difficulty_value(casted_diff_name)
 
     def _show_startup_locale_selector(self):
         locale_code = self._select_locale_screen.run()

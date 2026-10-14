@@ -1,6 +1,7 @@
 from math import sqrt
 import random
 from typing import Final
+from domain.ports.game_rules import GAME_FIELD_SIZE
 from lib.shift_looped_sequence import shift_looped_sequence
 
 
@@ -23,7 +24,7 @@ class GameNumMatrix:
         return self._matrix[row][col]
 
     def _generate_game_matrix(self):
-        size: Final[int] = 9
+        size: Final[int] = GAME_FIELD_SIZE
         block_size: Final[int] = int(sqrt(size))
         dictionary: Final[list[int]] = list(range(1, size + 1))
         random.shuffle(dictionary)
