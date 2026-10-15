@@ -7,7 +7,7 @@ from domain.game_process import GameProcess
 from domain.ports.game_rules import GAME_FIELD_SIZE, DifficultyDataAsArray, DifficultyNameEnum, GameStatus
 from lib.string import safe_str_to_enum
 from presentation.locales.locale_manager import LocaleInfo
-from presentation.screens.common.screen_with_keyboard_element_selection import ScreenWithKeyboardElementSelection
+from presentation.screens.common.screen_with_keyboard_element_selection import Coordinates, ScreenWithKeyboardElementSelection
 
 
 class MainScreen(ScreenWithKeyboardElementSelection[list[int]]):
@@ -41,7 +41,8 @@ class MainScreen(ScreenWithKeyboardElementSelection[list[int]]):
 
         self._status_label: Label | None = None
         default_focus_coordinates = [1, 0]
-        super().__init__([GAME_FIELD_SIZE + 1, GAME_FIELD_SIZE], default_focus_coordinates)
+        super().__init__([GAME_FIELD_SIZE + 1,
+                          GAME_FIELD_SIZE], default_focus_coordinates)
 
     def on_new_value(self, value: int):
         if self._game_process is None:
@@ -70,12 +71,15 @@ class MainScreen(ScreenWithKeyboardElementSelection[list[int]]):
         need_to_start_process = not self._game_process.get_is_in_progress()
         if need_to_restart_process or need_to_start_process:
             self._game_process.start_new_process(difficulty)
+        self._restore_element_focus_to_default_state()
         self._show()
 
     def restart(self, with_game_process_reload: bool = True):
         difficulty_level = self._config_manager.get_difficulty_level()
-        if with_game_process_reload and self._game_process and difficulty_level:
-            self._game_process.start_new_process(difficulty_level)
+        if with_game_process_reload:
+            self._restore_element_focus_to_default_state()
+            if self._game_process and difficulty_level:
+                self._game_process.start_new_process(difficulty_level)
 
         if not self._game_process and difficulty_level:
             self.run(difficulty_level)
@@ -84,7 +88,14 @@ class MainScreen(ScreenWithKeyboardElementSelection[list[int]]):
             self._drop_screen_data()
             self._show()
 
-    def _on_element_select(self, row: int, col: int):
+    @override
+    def _on_element_select(self, coordinates: Coordinates):
+        row = coordinates[0]
+        col = coordinates[1]
+
+        if row == -1 and self._reload_button:
+            self._reload_button.invoke()
+
         if not self._game_process:
             return
         is_unknown = self._game_process.check_is_unknown(row, col)
@@ -110,6 +121,7 @@ class MainScreen(ScreenWithKeyboardElementSelection[list[int]]):
         self._draw_top_menu()
         self._bind_default_key_handler(window)
         self._bind_dummy_for_focus(window)
+        self._focus_element_needed_to_focus()
         window.mainloop()
 
     def _draw_top_menu(self):
@@ -174,7 +186,7 @@ class MainScreen(ScreenWithKeyboardElementSelection[list[int]]):
                 btn_text = "" if is_unknown else str(
                     self._game_process.get_num_field_value(row, col))
                 btn = Button(curr_frame, text=btn_text, width=1,
-                             command=lambda row=row, col=col: self._on_element_select(row, col))
+                             command=lambda row=row, col=col: self._on_element_select([row, col]))
                 btn.grid(column=col, row=row)
                 row_buttons.append(btn)
             self._num_buttons.append(row_buttons)
@@ -231,7 +243,6 @@ class MainScreen(ScreenWithKeyboardElementSelection[list[int]]):
         self._selected_col = None
         self._is_in_progress = True
         self._status_label = None
-        self._drop_focused_element()
 
     def _get_top_bar_difficulty_label(self, difficulty: str):
         localized_diff = self._cb_get_text(f"select_diff.{difficulty}")
@@ -248,12 +259,12 @@ class MainScreen(ScreenWithKeyboardElementSelection[list[int]]):
 
     @override
     def _get_focused_element_value(self):
-        return self._focused_element_index
+        return [self._focused_element_index[0] - 1, self._focused_element_index[1]]
 
     @override
     def _check_coordinates_exist(self, row: int, col: int) -> bool:
         return not (row == 0 and col != self._focused_element_index[1])
-    
+
     @override
     def _get_element_needed_to_focus(self):
         if self._focused_element_index[0] == 0 and self._reload_button:

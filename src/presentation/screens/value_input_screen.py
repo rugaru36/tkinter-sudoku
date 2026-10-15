@@ -1,6 +1,8 @@
 from tkinter import EW, Button, Entry, Event, Label, Tk
-from typing import Callable, Final
+from typing import Callable, Final, override
 from tkinter.messagebox import showwarning
+
+from presentation.screens.common.screen_with_keyboard_handling import ScreenWithKeyboardHandling
 
 
 class ValidationTypes:
@@ -8,7 +10,7 @@ class ValidationTypes:
     random_characters: Final = 'Random Characters'
 
 
-class ValueInputScreen:
+class ValueInputScreen(ScreenWithKeyboardHandling):
 
     def __init__(self, cb_on_confirm: Callable[[str | None], None], get_text_cb: Callable[[str], str], screen_code: str = "") -> None:
         self._root_widget: Tk | None = None
@@ -77,17 +79,15 @@ class ValueInputScreen:
         entry.focus()
         entry.grid(row=1, column=0, columnspan=5, ipadx=50,
                    ipady=6, padx=4, pady=4, sticky=EW)
-                   
-        _ = window.bind("<Return>", self._on_confirm)
-        _ = window.bind("<KP_Enter>", self._on_confirm)
-        _ = window.bind("<Escape>", self._destroy_root_widget)
-
+    
         ok_btn_msg = self._get_text("on_confirm")
         ok_btn = Button(window, text=ok_btn_msg, command=self._on_confirm)
         ok_btn.grid(row=2, column=0, columnspan=5, ipadx=50,
                     ipady=6, padx=4, pady=4, sticky=EW)
 
         self._root_widget = window
+        self._bind_default_key_handler(window)
+
         self._message_label = message_label
 
         window.grab_set()
@@ -112,3 +112,11 @@ class ValueInputScreen:
         key_from_ext_text_storage = f"{self._screen_code}.{key}" if len(
             self._screen_code) > 0 else key
         return self._cb_get_text(key_from_ext_text_storage)
+
+    @override
+    def _handle_enter_key(self):
+        self._on_confirm()
+
+    @override
+    def _handle_escape_key(self):
+        self._destroy_root_widget()

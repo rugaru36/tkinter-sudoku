@@ -25,7 +25,7 @@ class ScreenWithKeyboardElementSelection[ElementValueType](ScreenWithKeyboardHan
     def _check_coordinates_exist(self, row: int, col: int) -> bool:
         return True
 
-    def _on_select(self, _new_value: ElementValueType):
+    def _on_element_select(self, _new_value: ElementValueType):
         pass
 
     def _focus_element_needed_to_focus(self):
@@ -33,7 +33,7 @@ class ScreenWithKeyboardElementSelection[ElementValueType](ScreenWithKeyboardHan
         if element:
             element.focus()
 
-    def _drop_focused_element(self):
+    def _restore_element_focus_to_default_state(self):
         if self._dummy_focus_element:
             self._dummy_focus_element.focus()
         self._selection_sizes = self._default_coordinates
@@ -44,7 +44,7 @@ class ScreenWithKeyboardElementSelection[ElementValueType](ScreenWithKeyboardHan
 
     @override
     def _handle_escape_key(self):
-        self._drop_focused_element()
+        self._restore_element_focus_to_default_state()
 
     @override
     def _handle_arrow_key(self, direction: ArrowKeysSymLiteral):
@@ -90,4 +90,4 @@ class ScreenWithKeyboardElementSelection[ElementValueType](ScreenWithKeyboardHan
     def _handle_enter_key(self):
         new_value = self._get_focused_element_value()
         if new_value:
-            self._on_select(new_value)
+            self._on_element_select(new_value)
