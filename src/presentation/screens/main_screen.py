@@ -121,7 +121,6 @@ class MainScreen(ScreenWithKeyboardElementSelection[list[int]]):
         self._draw_top_menu()
         self._bind_default_key_handler(window)
         self._bind_dummy_for_focus(window)
-        self._focus_element_needed_to_focus()
         window.mainloop()
 
     def _draw_top_menu(self):

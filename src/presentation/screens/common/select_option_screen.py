@@ -1,13 +1,14 @@
 
 from enum import Enum
 from typing import Final, Generic, TypeVar, Callable, override
-from tkinter import NSEW, Button, Tk
+from tkinter import NSEW, Button, Tk, Widget
 
 from presentation.screens.common.screen_with_keyboard_element_selection import ScreenWithKeyboardElementSelection
 from presentation.screens.common.screen_with_keyboard_handling import ArrowKeysSymLiteral
 
 OptionType = TypeVar('OptionType', bound=str | bool | int | Enum)
 KeyType = TypeVar('KeyType', bound=str | Enum)
+
 
 class Option(Generic[OptionType]):
     def __init__(self, name: str, value: OptionType) -> None:
@@ -24,7 +25,7 @@ class SelectOptionScreen(ScreenWithKeyboardElementSelection[OptionType]):
         self._title_name: Final = title_name
         self._buttons: list[Button] = []
         self._root_widget: Tk | None = None
-        super().__init__([0, len(options)])
+        super().__init__([len(options), 0])
 
     def run(self):
         self._value = None
@@ -46,7 +47,6 @@ class SelectOptionScreen(ScreenWithKeyboardElementSelection[OptionType]):
             self._buttons.append(btn)
 
         self._bind_default_key_handler(window)
-        self._buttons[self._focused_element_index[1]].focus()
         self._root_widget = window
 
         window.mainloop()
@@ -61,21 +61,25 @@ class SelectOptionScreen(ScreenWithKeyboardElementSelection[OptionType]):
         print(selected_option.name)
         self._on_element_select(selected_option.value)
 
+    # @override
+    # def _handle_arrow_key(self, direction: ArrowKeysSymLiteral):
+    #     new_focus_index = self._focused_element_index[1]
+    #     if direction == "Down":
+    #         new_focus_index = new_focus_index + 1
+    #     elif direction == "Up":
+    #         new_focus_index = new_focus_index - 1
+    #     if new_focus_index > (len(self._options) - 1) or new_focus_index < 0:
+    #         return
+    #     self._buttons[new_focus_index].focus()
+    #     self._focused_element_index[1] = new_focus_index
+
     @override
-    def _handle_arrow_key(self, direction: ArrowKeysSymLiteral):
-        new_focus_index = self._focused_element_index[1]
-        if direction == "Down":
-            new_focus_index = new_focus_index + 1
-        elif direction == "Up":
-            new_focus_index = new_focus_index - 1
-        if new_focus_index > (len(self._options) - 1) or new_focus_index < 0:
-            return
-        self._buttons[new_focus_index].focus()
-        self._focused_element_index[1] = new_focus_index
+    def _get_element_needed_to_focus(self) -> Widget | None:
+        return self._buttons[self._focused_element_index[0]]
 
     @override
     def _get_focused_element_value(self) -> OptionType | None:
-        return self._options[self._focused_element_index[1]].value
+        return self._options[self._focused_element_index[0]].value
 
     @override
     def _handle_escape_key(self):

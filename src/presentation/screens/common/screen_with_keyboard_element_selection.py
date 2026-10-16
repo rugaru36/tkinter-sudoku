@@ -8,11 +8,13 @@ Coordinates = SelectionSize
 
 ElementType = TypeVar("ElementType")
 
+
 class ScreenWithKeyboardElementSelection[ElementValueType](ScreenWithKeyboardHandling):
     def __init__(self, selection_sizes: SelectionSize, default_focus_coordinates: Coordinates | None = None):
         self._is_any_element_focused: bool = False
-        self._selection_sizes: SelectionSize = selection_sizes
-        self._default_coordinates: Final = [0,0] if not default_focus_coordinates else default_focus_coordinates
+        self._selection_sizes: Final[Coordinates] = selection_sizes
+        self._default_coordinates: Final[Coordinates] = [
+            0, 0] if not default_focus_coordinates else default_focus_coordinates
         self._focused_element_index: Coordinates = self._default_coordinates
         self._dummy_focus_element: Widget | Tk | None = None
 
@@ -36,7 +38,7 @@ class ScreenWithKeyboardElementSelection[ElementValueType](ScreenWithKeyboardHan
     def _restore_element_focus_to_default_state(self):
         if self._dummy_focus_element:
             self._dummy_focus_element.focus()
-        self._selection_sizes = self._default_coordinates
+        self._focused_element_index = self._default_coordinates
         self._is_any_element_focused = False
 
     def _get_focused_element_value(self) -> ElementValueType | None:
