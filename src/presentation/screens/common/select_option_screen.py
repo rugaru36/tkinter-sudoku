@@ -4,7 +4,6 @@ from typing import Final, Generic, TypeVar, Callable, override
 from tkinter import NSEW, Button, Tk, Widget
 
 from presentation.screens.common.screen_with_keyboard_element_selection import ScreenWithKeyboardElementSelection
-from presentation.screens.common.screen_with_keyboard_handling import ArrowKeysSymLiteral
 
 OptionType = TypeVar('OptionType', bound=str | bool | int | Enum)
 KeyType = TypeVar('KeyType', bound=str | Enum)
@@ -60,18 +59,6 @@ class SelectOptionScreen(ScreenWithKeyboardElementSelection[OptionType]):
         selected_option = self._options[index]
         print(selected_option.name)
         self._on_element_select(selected_option.value)
-
-    # @override
-    # def _handle_arrow_key(self, direction: ArrowKeysSymLiteral):
-    #     new_focus_index = self._focused_element_index[1]
-    #     if direction == "Down":
-    #         new_focus_index = new_focus_index + 1
-    #     elif direction == "Up":
-    #         new_focus_index = new_focus_index - 1
-    #     if new_focus_index > (len(self._options) - 1) or new_focus_index < 0:
-    #         return
-    #     self._buttons[new_focus_index].focus()
-    #     self._focused_element_index[1] = new_focus_index
 
     @override
     def _get_element_needed_to_focus(self) -> Widget | None:
