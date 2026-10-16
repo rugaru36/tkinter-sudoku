@@ -20,7 +20,7 @@ class SelectOptionScreen(ScreenWithKeyboardElementSelection[OptionType]):
         self._value: OptionType | None = None
         self._options: Final = options
         self._get_text_cb: Final = get_text_cb
-        self._on_select_cb: Final = on_select_cb
+        self._on_element_select_cb: Final = on_select_cb
         self._title_name: Final = title_name
         self._buttons: list[Button] = []
         self._root_widget: Tk | None = None
@@ -39,7 +39,7 @@ class SelectOptionScreen(ScreenWithKeyboardElementSelection[OptionType]):
         row = 0
         for option in self._options:
             btn = Button(text=f"{row + 1}. " + self._get_text_cb(option.name),
-                         command=lambda value=option.value: self._on_select(value))
+                         command=lambda value=option.value: self._on_element_select(value))
             btn.grid(row=row, column=0, columnspan=10, ipadx=100,
                      ipady=6, padx=4, pady=4, sticky=NSEW)
             row = row + 1
@@ -59,7 +59,7 @@ class SelectOptionScreen(ScreenWithKeyboardElementSelection[OptionType]):
         index = input_num - 1
         selected_option = self._options[index]
         print(selected_option.name)
-        self._on_select(selected_option.value)
+        self._on_element_select(selected_option.value)
 
     @override
     def _handle_arrow_key(self, direction: ArrowKeysSymLiteral):
@@ -84,10 +84,10 @@ class SelectOptionScreen(ScreenWithKeyboardElementSelection[OptionType]):
         self._focused_element_index[1] = 0
 
     @override
-    def _on_select(self, new_value: OptionType):
+    def _on_element_select(self, new_value: OptionType):
         self._value = new_value
         self._destroy_root_widget()
-        self._on_select_cb(new_value)
+        self._on_element_select_cb(new_value)
 
     def _destroy_root_widget(self):
         if self._root_widget:
